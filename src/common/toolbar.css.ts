@@ -11,8 +11,8 @@ const tileToolbarFadeIn = Styles.keyframes({
 Styles.cssRule('ide-toolbar', {
   display: 'block',
   $nest: {
-    '.ide-component.active, .ide-component:hover': {
-      border: `2px solid ${Theme.colors.primary.main}`
+    '.ide-component.active, .ide-component.hover-border': {
+      outline: `2px solid ${Theme.colors.primary.main}`
     },
     '.ide-component': {
       border: `2px solid transparent`,
@@ -46,7 +46,7 @@ Styles.cssRule('ide-toolbar', {
           padding: '0.5rem 1rem'
         },
         'i-input': {
-          border: `1px solid ${Theme.divider}`,
+          border: `1px solid var(--builder-divider)`,
           // marginBottom: '1rem'
         },
         '.modal': {
@@ -105,7 +105,7 @@ Styles.cssRule('ide-toolbar', {
           $nest: {
             '.tabs-nav': {
               border: 0,
-              borderRight: `1px solid ${Theme.divider}`,
+              borderRight: `1px solid var(--builder-divider)`,
               paddingRight: '0.5rem'
             },
             'i-tab': {
