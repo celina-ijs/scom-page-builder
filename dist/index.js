@@ -6740,7 +6740,6 @@ define("@scom/scom-page-builder", ["require", "exports", "@ijstech/components", 
                 }
                 else {
                     const dragEnter = this.pnlEditor.querySelector('.is-dragenter');
-                    console.log(event.target, dragEnter);
                     const pageRow = dragEnter && dragEnter.closest('ide-row');
                     if (pageRow && pageRow.onAppendRow) {
                         pageRow.onAppendRow(pageRow);

@@ -141,7 +141,6 @@ export default class Editor extends Module {
                 application.EventBus.dispatch(EVENT.ON_ADD_SECTION);
             } else {
                 const dragEnter = this.pnlEditor.querySelector('.is-dragenter') as Control;
-                console.log(event.target, dragEnter)
                 const pageRow = dragEnter && dragEnter.closest('ide-row') as PageRow;
                 if (pageRow && pageRow.onAppendRow) {
                     pageRow.onAppendRow(pageRow);
