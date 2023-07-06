@@ -937,6 +937,7 @@ define("@scom/scom-page-builder/store/index.ts", ["require", "exports", "@ijstec
                 elm.elements = value.elements;
             if (value.column !== undefined && value.column !== elm.column) {
                 elm.column = value.column;
+                // For automatic
                 // const section = this.getRow(sectionId);
                 // if (section?.elements) section.elements = this.sortFn([...section.elements]);
             }
@@ -4267,9 +4268,8 @@ define("@scom/scom-page-builder/page/pageRow.tsx", ["require", "exports", "@ijst
                     for (const block of blocks) {
                         if (isCurrentEnter(block))
                             continue;
-                        block.visible = block.classList.contains(ROW_BOTTOM_CLASS);
-                        block.classList.remove('is-dragenter');
-                        block.visible = block.classList.contains(ROW_TOP_CLASS);
+                        const visible = block.classList.contains(ROW_BOTTOM_CLASS) || block.classList.contains(ROW_TOP_CLASS);
+                        block.visible = visible;
                         block.classList.remove('is-dragenter');
                     }
                 }
@@ -4592,7 +4592,8 @@ define("@scom/scom-page-builder/page/pageRow.tsx", ["require", "exports", "@ijst
             function removeClass(className) {
                 const elements = parentWrapper.getElementsByClassName(className);
                 for (const element of elements) {
-                    if (className === 'is-dragenter' && !element.classList.contains(ROW_BOTTOM_CLASS)) {
+                    const isNotHidden = element.classList.contains(ROW_BOTTOM_CLASS) || element.classList.contains(ROW_TOP_CLASS);
+                    if (className === 'is-dragenter' && !isNotHidden) {
                         element.visible = false;
                     }
                     element.classList.remove(className);
@@ -6739,6 +6740,7 @@ define("@scom/scom-page-builder", ["require", "exports", "@ijstech/components", 
                 }
                 else {
                     const dragEnter = this.pnlEditor.querySelector('.is-dragenter');
+                    console.log(event.target, dragEnter);
                     const pageRow = dragEnter && dragEnter.closest('ide-row');
                     if (pageRow && pageRow.onAppendRow) {
                         pageRow.onAppendRow(pageRow);

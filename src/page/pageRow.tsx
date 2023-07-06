@@ -612,9 +612,8 @@ export class PageRow extends Module {
                 }
                 for (const block of blocks) {
                     if (isCurrentEnter(block as Control)) continue;
-                    (block as Control).visible = block.classList.contains(ROW_BOTTOM_CLASS);
-                    block.classList.remove('is-dragenter');
-                    (block as Control).visible = block.classList.contains(ROW_TOP_CLASS);
+                    const visible = block.classList.contains(ROW_BOTTOM_CLASS) || block.classList.contains(ROW_TOP_CLASS);
+                    (block as Control).visible = visible;
                     block.classList.remove('is-dragenter');
                 }
             }
@@ -943,7 +942,8 @@ export class PageRow extends Module {
         function removeClass(className: string) {
             const elements = parentWrapper.getElementsByClassName(className);
             for (const element of elements) {
-                if (className === 'is-dragenter' && !element.classList.contains(ROW_BOTTOM_CLASS)) {
+                const isNotHidden = element.classList.contains(ROW_BOTTOM_CLASS) || element.classList.contains(ROW_TOP_CLASS);
+                if (className === 'is-dragenter' && !isNotHidden) {
                     (element as Control).visible = false;
                 }
                 element.classList.remove(className);
