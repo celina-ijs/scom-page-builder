@@ -357,15 +357,10 @@ declare module "@scom/scom-page-builder/interface/siteData.ts" {
         elements: IPageElement[];
         config?: IPageSectionConfig;
     }
-    export enum ElementType {
-        PRIMITIVE = "primitive",
-        COMPOSITE = "composite"
-    }
     export interface IPageElement {
         id: string;
         column: number;
         columnSpan: number;
-        type: ElementType;
         tag?: any;
         properties: any;
         module?: IPageBlockData;

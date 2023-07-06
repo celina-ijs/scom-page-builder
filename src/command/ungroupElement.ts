@@ -3,7 +3,7 @@ import { pageObject } from "../store/index";
 import { Control } from "@ijstech/components";
 import { application } from "@ijstech/components";
 import { EVENT } from "../const/index";
-import { ElementType } from "../interface/index";
+// import { ElementType } from "../interface/index";
 
 export class UngroupElementCommand implements ICommand {
     private draggingToolbar: any;
@@ -92,7 +92,7 @@ export class UngroupElementCommand implements ICommand {
         pageObject.addElement(dropRowId, newElement, dropSectionId, elementIndex + 1);
       } else if (!isComposite) {
         pageObject.setElement(dropRowId, dropSectionId, {
-          type: ElementType.COMPOSITE, // to be removed
+          // type: ElementType.COMPOSITE, // to be removed
           elements: [clonedDropSecData, newElement],
           dropId: this.data?.id || ''
         })
@@ -143,7 +143,7 @@ export class UngroupElementCommand implements ICommand {
     
     const newElm = row.querySelector(`#elm-${elmId}`)
     // const sectionEl = newElm.closest('ide-section');
-    newElm.remove();
+    newElm && newElm.remove();
     const section = pageObject.getRow(rowId);
     // const isEmpty = !section?.elements?.length || section?.elements.every(el => el.type === "composite" && !el.elements?.length);
     // row && row.toggleUI(!isEmpty);
@@ -198,9 +198,9 @@ export class UngroupElementCommand implements ICommand {
         return elm;
       })
       pageObject.setElement(dropRowId, prevSectionId, {
-        type: ElementType.COMPOSITE, // to be removed
+        // type: ElementType.COMPOSITE, // to be removed
         elements: [clonedDropSecData, ...updatedList],
-        // dropId: this.data?.id || ''
+        dropId: this.data?.id || ''
       })
     }
     const newDropData = pageObject.getElement(dropRowId, prevSectionId);

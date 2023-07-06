@@ -902,7 +902,7 @@ export class PageRow extends Module {
                     if (elementConfig) {
                         const parentId = pageRow?.id.replace('row-', '');
                         const elements = parentId ? pageObject.getRow(parentId)?.elements || [] : [];
-                        const hasData = elements.find(el => el.type === 'primitive' || (el.type === 'composite' && el.elements?.length));
+                        const hasData = elements.find((el: IPageElement) => Object.keys(el.module || {}).length || el.elements?.length);
                         const dragCmd = !hasData && new AddElementCommand(self.getNewElementData(), true, true, null, pageRow);
                         dragCmd && await commandHistory.execute(dragCmd);
                     } else {
