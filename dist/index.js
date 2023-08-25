@@ -8670,7 +8670,7 @@ define("@scom/scom-page-builder/builder/builderFooter.tsx", ["require", "exports
             var _a;
             this.pnlFooterMain.clearInnerHTML();
             this.showAddStack = ((_a = this._elements) === null || _a === void 0 ? void 0 : _a.length) === 0 && !this._image;
-            this.pnlFooter.background = this.showAddStack ? { color: Theme.background.main, image: '' } : { image: this._image };
+            this.pnlFooter.background = this.showAddStack ? { color: 'var(--background-main)', image: '' } : { image: this._image };
             this.pnlEditOverlay.visible = !this.showAddStack;
             this.pnlEditOverlay.classList.remove('flex');
             this.pnlConfig.visible = !this.showAddStack;
