@@ -93,9 +93,9 @@ export default class Editor extends Module {
         const bgColor = getBackgroundColor(this.theme);
         const fontColor = getFontColor(this.theme);
         const dividerColor = getDivider(this.theme);
-        this.style.setProperty('--builder-bg', bgColor);
-        this.style.setProperty('--builder-color', fontColor);
-        this.style.setProperty('--builder-divider', dividerColor);
+        this.style.setProperty('--background-main', bgColor);
+        this.style.setProperty('--text-primary', fontColor);
+        this.style.setProperty('--divider', dividerColor);
     }
 
     get commandHistoryIndex(): number {
@@ -277,7 +277,7 @@ export default class Editor extends Module {
 
     private updatePageConfig() {
         const { backgroundColor, margin } = getDefaultPageConfig();
-        this.style.setProperty('--builder-bg', backgroundColor);
+        this.style.setProperty('--background-main', backgroundColor);
         if (this.pnlEditor) {
             this.pnlEditor.maxWidth = '100%'; // maxWidth ?? '100%';
             const marginStyle = getMargin(margin);
@@ -395,7 +395,7 @@ export default class Editor extends Module {
                                 minHeight="100vh"
                                 width="100%"
                                 margin={{ top: 8, bottom: 8, left: 60, right: 60 }}
-                                background={{ color: 'var(--builder-bg)' }}
+                                background={{ color: 'var(--background-main)' }}
                                 class="pnl-editor-wrapper"
                             >
                                 <i-panel

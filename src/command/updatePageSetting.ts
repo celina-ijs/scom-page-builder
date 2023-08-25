@@ -63,21 +63,21 @@ export class UpdatePageSettingsCommand implements ICommand {
     }
     if (customBackgroundColor) {
       if (updatedValues.includes('backgroundColor')) {
-        element.style.setProperty('--builder-bg', backgroundColor);
+        element.style.setProperty('--background-main', backgroundColor);
         data.customBackgroundColor = customBackgroundColor
         data.backgroundColor = backgroundColor;
       }
     } else {
-      element.style.setProperty('--builder-bg', defaultBackgroundColor);
+      element.style.setProperty('--background-main', defaultBackgroundColor);
     }
     if (customTextColor) {
       if (updatedValues.includes('textColor')) {
-        element.style.setProperty('--builder-color', textColor);
+        element.style.setProperty('--text-primary', textColor);
         data.customTextColor = customTextColor
         data.textColor = textColor;
       }
     } else {
-      element.style.setProperty('--builder-color', defaultTextColor);
+      element.style.setProperty('--text-primary', defaultTextColor);
     }
     if (customTextSize) {
       if (updatedValues.includes('textSize')) {

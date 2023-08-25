@@ -3222,23 +3222,23 @@ define("@scom/scom-page-builder/command/updatePageSetting.ts", ["require", "expo
             };
             if (customBackgroundColor) {
                 if (updatedValues.includes('backgroundColor')) {
-                    element.style.setProperty('--builder-bg', backgroundColor);
+                    element.style.setProperty('--background-main', backgroundColor);
                     data.customBackgroundColor = customBackgroundColor;
                     data.backgroundColor = backgroundColor;
                 }
             }
             else {
-                element.style.setProperty('--builder-bg', defaultBackgroundColor);
+                element.style.setProperty('--background-main', defaultBackgroundColor);
             }
             if (customTextColor) {
                 if (updatedValues.includes('textColor')) {
-                    element.style.setProperty('--builder-color', textColor);
+                    element.style.setProperty('--text-primary', textColor);
                     data.customTextColor = customTextColor;
                     data.textColor = textColor;
                 }
             }
             else {
-                element.style.setProperty('--builder-color', defaultTextColor);
+                element.style.setProperty('--text-primary', defaultTextColor);
             }
             if (customTextSize) {
                 if (updatedValues.includes('textSize')) {
@@ -4572,7 +4572,7 @@ define("@scom/scom-page-builder/common/toolbar.css.ts", ["require", "exports", "
                         }
                     },
                     'i-input': {
-                    // border: `1px solid var(--builder-divider)`,
+                    // border: `1px solid var(--divider)`,
                     // marginBottom: '1rem'
                     },
                     '.modal': {
@@ -4655,7 +4655,7 @@ define("@scom/scom-page-builder/common/toolbar.css.ts", ["require", "exports", "
                         $nest: {
                             '.tabs-nav': {
                                 border: 0,
-                                // borderRight: `1px solid var(--builder-divider)`,
+                                // borderRight: `1px solid var(--divider)`,
                                 paddingRight: '0.5rem'
                             },
                             'i-tab': {
@@ -4922,8 +4922,8 @@ define("@scom/scom-page-builder/page/pageRow.tsx", ["require", "exports", "@ijst
             this.appendChild(this.$render("i-panel", { position: "absolute", width: "100%", height: "3px", top: "-3px", zIndex: 90, 
                 // border={{radius: '5px'}}
                 class: ROW_TOP_CLASS }));
-            this.style.setProperty('--row-background', 'var(--builder-bg)');
-            this.style.setProperty('--row-font_color', 'var(--builder-color)');
+            this.style.setProperty('--row-background', Theme.background.main);
+            this.style.setProperty('--row-font_color', Theme.text.primary);
         }
         toggleUI(value) {
             if (this.pnlRow)
@@ -5010,7 +5010,7 @@ define("@scom/scom-page-builder/page/pageRow.tsx", ["require", "exports", "@ijst
                 if (backdropImage)
                     this.background.image = backdropImage;
                 else // if (backdropColor) this.background.color = backdropColor;
-                    this.style.setProperty('--row-background', backdropColor || 'var(--builder-bg)');
+                    this.style.setProperty('--row-background', backdropColor || Theme.background.main);
                 if (!image && !backdropImage)
                     this.background.image = undefined;
             }
@@ -5018,7 +5018,7 @@ define("@scom/scom-page-builder/page/pageRow.tsx", ["require", "exports", "@ijst
                 this.pnlRowWrap.border.width = 0;
                 // if (backgroundColor)
                 // this.background.color = backgroundColor;
-                this.style.setProperty('--row-background', backgroundColor || 'var(--builder-bg)');
+                this.style.setProperty('--row-background', backgroundColor || Theme.background.main);
                 this.background.image = '';
             }
             // if (backgroundColor) {
@@ -5943,7 +5943,7 @@ define("@scom/scom-page-builder/page/pageRow.tsx", ["require", "exports", "@ijst
             components_25.application.EventBus.dispatch(index_44.EVENT.ON_ADD_SECTION, { prependId, appendId });
         }
         render() {
-            return (this.$render("i-panel", { id: "pnlRowContainer", class: 'page-row-container', width: "100%", height: "100%", background: { color: 'var(--row-background, var(--builder-bg))' }, font: { color: 'var(--row-font_color, var(--builder-color))' } },
+            return (this.$render("i-panel", { id: "pnlRowContainer", class: 'page-row-container', width: "100%", height: "100%", background: { color: `var(--row-background, ${Theme.background.main})` }, font: { color: `var(--row-font_color, ${Theme.text.primary})` } },
                 this.$render("i-panel", { id: "pnlRowWrap", class: 'page-row', width: "100%", height: "100%" },
                     this.$render("i-button", { caption: "", icon: {
                             name: 'plus',
@@ -5977,11 +5977,11 @@ define("@scom/scom-page-builder/page/pageRow.tsx", ["require", "exports", "@ijst
                         this.$render("i-panel", { padding: { top: '3rem', bottom: '3rem' }, margin: { top: '3rem', bottom: '3rem' }, width: "100%", border: {
                                 width: '1px',
                                 style: 'dashed',
-                                color: 'var(--builder-divider)',
+                                color: Theme.divider
                             }, class: "text-center" },
                             this.$render("i-label", { caption: "Drag Elements Here", font: {
                                     transform: 'uppercase',
-                                    color: 'var(--builder-color)',
+                                    color: Theme.text.primary,
                                     size: '1.25rem',
                                 }, opacity: 0.5 }))),
                     this.$render("i-grid-layout", { id: "pnlRow", width: "100%", height: "100%", maxWidth: "100%", maxHeight: "100%", position: "relative", class: "grid", opacity: 0 }),
@@ -7238,7 +7238,7 @@ define("@scom/scom-page-builder/page/pageRows.tsx", ["require", "exports", "@ijs
                 const rowData = index_66.pageObject.sections[i];
                 const pageRow = (this.$render("ide-row", { maxWidth: "100%", maxHeight: "100%" }));
                 if (!this._readonly) {
-                    pageRow.border = { top: { width: '1px', style: 'dashed', color: 'var(--builder-divider)' } };
+                    pageRow.border = { top: { width: '1px', style: 'dashed', color: Theme.divider } };
                     this.initDragEvent(pageRow);
                 }
                 const isInit = i == 0 && index_66.pageObject.sections.length == 1;
@@ -7252,7 +7252,7 @@ define("@scom/scom-page-builder/page/pageRows.tsx", ["require", "exports", "@ijs
             var _a;
             const pageRow = (this.$render("ide-row", { maxWidth: "100%", maxHeight: "100%" }));
             if (!this._readonly) {
-                pageRow.border = { top: { width: '1px', style: 'dashed', color: 'var(--builder-divider)' } };
+                pageRow.border = { top: { width: '1px', style: 'dashed', color: Theme.divider } };
                 this.initDragEvent(pageRow);
             }
             pageRow.visible = !!((_a = rowData === null || rowData === void 0 ? void 0 : rowData.elements) === null || _a === void 0 ? void 0 : _a.length);
@@ -7278,7 +7278,7 @@ define("@scom/scom-page-builder/page/pageRows.tsx", ["require", "exports", "@ijs
             const { prependId = '', appendId = '', defaultElements = [] } = params || {};
             const pageRow = (this.$render("ide-row", { maxWidth: "100%", maxHeight: "100%" }));
             if (!this._readonly) {
-                pageRow.border = { top: { width: '1px', style: 'dashed', color: 'var(--builder-divider)' } };
+                pageRow.border = { top: { width: '1px', style: 'dashed', color: Theme.divider } };
                 this.initDragEvent(pageRow);
             }
             const rowData = {
@@ -8589,7 +8589,7 @@ define("@scom/scom-page-builder/builder/builderHeader.tsx", ["require", "exports
                     this.$render("i-panel", null)),
                 this.$render("i-hstack", { id: "pnlConfig", background: { color: '#fafafa' }, bottom: "0px", left: "0px", position: "absolute", verticalAlignment: "center", border: { radius: 2 }, margin: { left: 12, top: 12, bottom: 12, right: 12 }, height: "40px", class: "custom-box", visible: false },
                     this.$render("i-button", { id: "btnChangeImg", class: "btn-add", icon: { name: 'image', fill: 'rgba(0,0,0,.54)' }, font: { color: 'rgba(0,0,0,.54)' }, background: { color: 'transparent' }, padding: { left: 6, right: 6 }, height: "100%", border: { width: 0 }, caption: "Change Image", onClick: () => this.onChangedBg() }),
-                    this.$render("i-button", { id: "btnChangeType", class: "btn-add", icon: { name: 'columns', fill: 'rgba(0,0,0,.54)' }, font: { color: 'rgba(0,0,0,.54)' }, background: { color: 'transparent' }, padding: { left: 6, right: 6 }, height: "100%", border: { width: 0, left: { width: '1px', style: 'solid', color: 'var(--builder-divider)' } }, caption: "Header Type", onClick: () => this.onToggleType(true) })),
+                    this.$render("i-button", { id: "btnChangeType", class: "btn-add", icon: { name: 'columns', fill: 'rgba(0,0,0,.54)' }, font: { color: 'rgba(0,0,0,.54)' }, background: { color: 'transparent' }, padding: { left: 6, right: 6 }, height: "100%", border: { width: 0, left: { width: '1px', style: 'solid', color: Theme.divider } }, caption: "Header Type", onClick: () => this.onToggleType(true) })),
                 this.$render("i-panel", { id: "pnlHeaderType", visible: false, background: { color: '#fafafa' }, bottom: "0px", left: "0px", position: "absolute", border: { radius: 2 }, margin: { left: 12, top: 12, bottom: 12, right: 12 }, class: "custom-box", height: "auto", width: "auto" },
                     this.$render("i-hstack", { id: "pnlHeaderTypeMain", gap: "1rem", margin: { left: 8, top: 8, bottom: 8, right: 8 }, height: "100%", width: "100%", verticalAlignment: "center" })),
                 this.$render("i-modal", { id: 'mdUpload', title: 'Select Image', closeIcon: { name: 'times' }, width: 400, closeOnBackdropClick: false },
@@ -8670,7 +8670,7 @@ define("@scom/scom-page-builder/builder/builderFooter.tsx", ["require", "exports
             var _a;
             this.pnlFooterMain.clearInnerHTML();
             this.showAddStack = ((_a = this._elements) === null || _a === void 0 ? void 0 : _a.length) === 0 && !this._image;
-            this.pnlFooter.background = this.showAddStack ? { color: 'var(--builder-bg)', image: '' } : { image: this._image };
+            this.pnlFooter.background = this.showAddStack ? { color: Theme.background.main, image: '' } : { image: this._image };
             this.pnlEditOverlay.visible = !this.showAddStack;
             this.pnlEditOverlay.classList.remove('flex');
             this.pnlConfig.visible = !this.showAddStack;
@@ -8908,9 +8908,9 @@ define("@scom/scom-page-builder", ["require", "exports", "@ijstech/components", 
             const bgColor = (0, index_88.getBackgroundColor)(this.theme);
             const fontColor = (0, index_88.getFontColor)(this.theme);
             const dividerColor = (0, index_88.getDivider)(this.theme);
-            this.style.setProperty('--builder-bg', bgColor);
-            this.style.setProperty('--builder-color', fontColor);
-            this.style.setProperty('--builder-divider', dividerColor);
+            this.style.setProperty('--background-main', bgColor);
+            this.style.setProperty('--text-primary', fontColor);
+            this.style.setProperty('--divider', dividerColor);
         }
         get commandHistoryIndex() {
             return index_90.commandHistory.commandIndex;
@@ -9091,7 +9091,7 @@ define("@scom/scom-page-builder", ["require", "exports", "@ijstech/components", 
         }
         updatePageConfig() {
             const { backgroundColor, margin } = (0, index_88.getDefaultPageConfig)();
-            this.style.setProperty('--builder-bg', backgroundColor);
+            this.style.setProperty('--background-main', backgroundColor);
             if (this.pnlEditor) {
                 this.pnlEditor.maxWidth = '100%'; // maxWidth ?? '100%';
                 const marginStyle = (0, index_88.getMargin)(margin);
@@ -9163,7 +9163,7 @@ define("@scom/scom-page-builder", ["require", "exports", "@ijstech/components", 
                         width: "100%", horizontalAlignment: 'center' },
                         this.$render("i-panel", { id: "pnlEditor", 
                             // maxWidth={1024}
-                            minHeight: "100vh", width: "100%", margin: { top: 8, bottom: 8, left: 60, right: 60 }, background: { color: 'var(--builder-bg)' }, class: "pnl-editor-wrapper" },
+                            minHeight: "100vh", width: "100%", margin: { top: 8, bottom: 8, left: 60, right: 60 }, background: { color: 'var(--background-main)' }, class: "pnl-editor-wrapper" },
                             this.$render("i-panel", { id: "contentWrapper", padding: { bottom: '12rem' }, minHeight: "calc((100vh - 6rem) - 12rem)" },
                                 this.$render("ide-rows", { id: "pageRows", draggable: true })),
                             this.$render("builder-footer", { id: "builderFooter" })))),

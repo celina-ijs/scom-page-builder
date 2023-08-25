@@ -131,8 +131,8 @@ export class PageRow extends Module {
                 class={ROW_TOP_CLASS}
             ></i-panel>
         );
-        this.style.setProperty('--row-background', 'var(--builder-bg)')
-        this.style.setProperty('--row-font_color', 'var(--builder-color)')
+        this.style.setProperty('--row-background', Theme.background.main)
+        this.style.setProperty('--row-font_color', Theme.text.primary)
     }
 
     toggleUI(value: boolean) {
@@ -245,13 +245,13 @@ export class PageRow extends Module {
             if (backdropImage)
                 this.background.image = backdropImage;
             else // if (backdropColor) this.background.color = backdropColor;
-                this.style.setProperty('--row-background', backdropColor || 'var(--builder-bg)')
+                this.style.setProperty('--row-background', backdropColor || Theme.background.main)
             if (!image && !backdropImage) this.background.image = undefined
         } else {
             this.pnlRowWrap.border.width = 0
             // if (backgroundColor)
                 // this.background.color = backgroundColor;
-            this.style.setProperty('--row-background', backgroundColor || 'var(--builder-bg)')
+            this.style.setProperty('--row-background', backgroundColor || Theme.background.main)
             this.background.image = ''
         }
         // if (backgroundColor) {
@@ -1289,8 +1289,8 @@ export class PageRow extends Module {
                 id="pnlRowContainer"
                 class={'page-row-container'}
                 width="100%" height="100%"
-                background={{color: 'var(--row-background, var(--builder-bg))'}}
-                font={{color: 'var(--row-font_color, var(--builder-color))'}}
+                background={{color: `var(--row-background, ${Theme.background.main})`}}
+                font={{color: `var(--row-font_color, ${Theme.text.primary})`}}
             >
                 <i-panel
                     id="pnlRowWrap"
@@ -1409,7 +1409,7 @@ export class PageRow extends Module {
                             border={{
                                 width: '1px',
                                 style: 'dashed',
-                                color: 'var(--builder-divider)',
+                                color: Theme.divider
                             }}
                             class="text-center"
                         >
@@ -1417,7 +1417,7 @@ export class PageRow extends Module {
                                 caption="Drag Elements Here"
                                 font={{
                                     transform: 'uppercase',
-                                    color: 'var(--builder-color)',
+                                    color: Theme.text.primary,
                                     size: '1.25rem',
                                 }}
                                 opacity={0.5}

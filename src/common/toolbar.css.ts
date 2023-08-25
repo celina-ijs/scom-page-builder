@@ -75,7 +75,7 @@ Styles.cssRule('ide-toolbar', {
           }
         },
         'i-input': {
-          // border: `1px solid var(--builder-divider)`,
+          // border: `1px solid var(--divider)`,
           // marginBottom: '1rem'
         },
         '.modal': {
@@ -158,7 +158,7 @@ Styles.cssRule('ide-toolbar', {
           $nest: {
             '.tabs-nav': {
               border: 0,
-              // borderRight: `1px solid var(--builder-divider)`,
+              // borderRight: `1px solid var(--divider)`,
               paddingRight: '0.5rem'
             },
             'i-tab': {
