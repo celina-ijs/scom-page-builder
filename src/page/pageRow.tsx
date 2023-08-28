@@ -1203,18 +1203,27 @@ export class PageRow extends Module {
             if (!config) return;
             const id = this.id.replace('row-', '');
             const sectionConfig = pageObject.getRowConfig(id) || {};
-            let newConfig = {...getPageConfig(), ...config, ...sectionConfig};
+            let newConfig = {...getPageConfig(), ...sectionConfig, ...config};
             if (rowsConfig) {
                 const parsedData = rowsConfig[id] ? JSON.parse(rowsConfig[id]) : {};
                 newConfig = {...newConfig, ...parsedData};
             }
-            pageObject.updateSection(id, {config: JSON.parse(JSON.stringify(newConfig))});
-            if (config.backgroundColor)
-                this.pnlRowContainer.style.setProperty('--row-background', config.backgroundColor);
+            pageObject.updateSection(id, {config: {...newConfig}});
+            if (config.backgroundColor) {}
+                this.pnlRowContainer.style.setProperty('--row-background', newConfig.backgroundColor);
             if (config.textColor)
-                this.pnlRowContainer.style.setProperty('--row-font_color', config.textColor);
-            Reflect.deleteProperty(newConfig, 'backgroundColor')
-            Reflect.deleteProperty(newConfig, 'textColor')
+                this.pnlRowContainer.style.setProperty('--row-font_color', newConfig.textColor);
+            if (config.backgroundColor || config.textColor || config.textSize) {
+                const config =  {...(newConfig || {})}
+                const { backgroundColor, customBackgroundColor, customTextColor, textColor, customTextSize, textSize } = config;
+                const data = { backgroundColor, customBackgroundColor, customTextColor, textColor, customTextSize, textSize }
+                const toolbars = this.querySelectorAll('ide-toolbar');
+                for (let toolbar of toolbars) {
+                    (toolbar as any).updateUI(data);
+                }
+            }
+            // Reflect.deleteProperty(newConfig, 'backgroundColor')
+            // Reflect.deleteProperty(newConfig, 'textColor')
             this.updateRowConfig(newConfig);
             this.updateGridColumnWidth();
         });
@@ -1430,7 +1439,7 @@ export class PageRow extends Module {
                                 caption="Drag Elements Here"
                                 font={{
                                     transform: 'uppercase',
-                                    color: 'var(--builder-color)',
+                                    color: 'var(--row-font_color, var(--builder-color))',
                                     size: '1.25rem',
                                 }}
                                 opacity={0.5}

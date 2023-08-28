@@ -54,12 +54,12 @@ export class UpdatePageSettingsCommand implements ICommand {
     const defaultTextColor = Theme.text.primary
     const defaultTextSize = 'md'
     let data: any = {
-      customBackgroundColor: customBackgroundColor,
-      backgroundColor: backgroundColor ?? defaultBackgroundColor,
-      customTextColor: customTextColor,
-      textColor: textColor ?? defaultTextColor,
-      customTextSize: customTextSize,
-      textSize: textSize ?? defaultTextSize
+      // customBackgroundColor: customBackgroundColor,
+      // backgroundColor: backgroundColor ?? defaultBackgroundColor,
+      // customTextColor: customTextColor,
+      // textColor: textColor ?? defaultTextColor,
+      // customTextSize: customTextSize,
+      // textSize: textSize ?? defaultTextSize
     }
     if (customBackgroundColor) {
       if (updatedValues.includes('backgroundColor')) {
@@ -88,7 +88,8 @@ export class UpdatePageSettingsCommand implements ICommand {
     else {
       this.element.classList.remove('font-xs', 'font-sm', 'font-md', 'font-lg', 'font-xl');
     }
-    application.EventBus.dispatch(EVENT.ON_UPDATE_PAGE_BG, {...data});
+    // TODO: effected undo funtion
+    // application.EventBus.dispatch(EVENT.ON_UPDATE_PAGE_BG, {...data});
     this.element.maxWidth = '100%'; // maxWidth ?? '100%';
     this.element.margin = getMargin(margin);
     pageObject.config = { ...config };

@@ -342,7 +342,7 @@ export default class Editor extends Module {
         // }
 
         // if (customTextSize && textSize && ["xs", "sm", "md", "lg", "xl"].includes(textSize)) {
-        //     this.classList.add(`font-${textSize}`);
+        //     this.pnlEditor.classList.add(`font-${textSize}`);
         // }
         if (this.pnlEditor) {
             this.pnlEditor.padding = {
@@ -392,18 +392,18 @@ export default class Editor extends Module {
             }) => {
                 const {customBackgroundColor, customTextColor, customTextSize, backgroundColor, textColor, textSize} = data;
                 if (data.image) this.pnlEditor.style.backgroundImage = `url(${data.image})`
-                for (let i = this.classList.length - 1; i >= 0; i--) {
-                    const className = this.classList[i];
+                for (let i = this.pnlEditor.classList.length - 1; i >= 0; i--) {
+                    const className = this.pnlEditor.classList[i];
                     if (className.startsWith('font-')) {
-                        this.classList.remove(className);
+                        this.pnlEditor.classList.remove(className);
                     }
                 }
                 if(customBackgroundColor && backgroundColor)
                     this.pnlEditor.style.setProperty('--builder-bg', backgroundColor);
                 if(customTextColor && textColor)
-                this.pnlEditor.style.setProperty('--builder-color', textColor);
+                    this.pnlEditor.style.setProperty('--builder-color', textColor);
                 if (customTextSize && textSize) {
-                    this.classList.add(`font-${textSize}`)
+                    this.pnlEditor.classList.add(`font-${textSize}`)
                 }
             })
         )
