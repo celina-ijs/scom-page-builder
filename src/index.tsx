@@ -36,9 +36,6 @@ import {
     getCategories,
     setCategories,
     setTheme,
-    getBackgroundColor,
-    getFontColor,
-    getDivider,
     getDefaultPageConfig,
     getMargin,
     setDefaultPageConfig
@@ -129,12 +126,6 @@ export default class Editor extends Module {
     set theme(value: ThemeType) {
         this._theme = value ?? 'light';
         setTheme(this.theme);
-        const bgColor = getBackgroundColor(this.theme);
-        const fontColor = getFontColor(this.theme);
-        const dividerColor = getDivider(this.theme);
-        this.pnlEditor.style.setProperty('--background-main', bgColor);
-        this.pnlEditor.style.setProperty('--text-primary', fontColor);
-        this.pnlEditor.style.setProperty('--divider', dividerColor);
     }
 
     get commandHistoryIndex(): number {
@@ -273,7 +264,7 @@ export default class Editor extends Module {
         }
     }
 
-    init() {
+    async init() {
         const rootDir = this.getAttribute('rootDir', true);
         if (rootDir) this.setRootDir(rootDir);
         const components = this.getAttribute('components', true);
@@ -282,7 +273,9 @@ export default class Editor extends Module {
         if (categories) setCategories(categories);
         const onFetchComponents = this.getAttribute('onFetchComponents', true);
         if (onFetchComponents) this.onFetchComponents = onFetchComponents.bind(this);
-        super.init();
+        await super.init();
+        this.style.setProperty('--custom-background-color', '#ffffff');
+        this.style.setProperty('--custom-text-color', '#000000');
         this.initEventListeners();
         this.initData();
         this.theme = this.getAttribute('theme', true);
@@ -335,15 +328,7 @@ export default class Editor extends Module {
             sectionWidth
         } = config;
         application.EventBus.dispatch(EVENT.ON_UPDATE_PAGE_BG, {...config});
-        // if (backgroundImage) {
-        //     this.style.setProperty('--background-main', `url("${backgroundImage}") center center fixed`);
-        // } else if (customBackgroundColor && backgroundColor) {
-        //     this.style.setProperty('--background-main', backgroundColor);
-        // }
-
-        // if (customTextSize && textSize && ["xs", "sm", "md", "lg", "xl"].includes(textSize)) {
-        //     this.pnlEditor.classList.add(`font-${textSize}`);
-        // }
+        
         if (this.pnlEditor) {
             this.pnlEditor.padding = {
                 left: plr,
@@ -355,6 +340,19 @@ export default class Editor extends Module {
             const marginStyle = getMargin(margin);
             this.pnlEditor.margin = marginStyle;
             this.pnlEditor.style.width = `calc(100% - (2 * ${marginStyle.left}))`;
+
+            if (backgroundImage) {
+                const ipfsUrl = 'https://ipfs.scom.dev/ipfs';
+                this.pnlEditor.style.setProperty('--custom-background-color', `url("${ipfsUrl}/${backgroundImage}") center center fixed`);
+            } else if (customBackgroundColor && backgroundColor) {
+                this.pnlEditor.style.setProperty('--custom-background-color', backgroundColor);
+            }
+            else
+                this.pnlEditor.style.removeProperty('--custom-background-color');
+            if (customTextColor && textColor) 
+                this.pnlEditor.style.setProperty('--custom-text-color', textColor)
+            else
+                this.pnlEditor.style.removeProperty('--custom-text-color');
         }
     }
 
@@ -391,17 +389,22 @@ export default class Editor extends Module {
                 textSize?: string
             }) => {
                 const {customBackgroundColor, customTextColor, customTextSize, backgroundColor, textColor, textSize} = data;
-                if (data.image) this.pnlEditor.style.backgroundImage = `url(${data.image})`
-                for (let i = this.pnlEditor.classList.length - 1; i >= 0; i--) {
-                    const className = this.pnlEditor.classList[i];
+                const ipfsUrl = `https://ipfs.scom.dev/ipfs`
+                if (data.image) this.pnlEditor.style.backgroundImage = `url("${ipfsUrl}/${data.image}")`;
+                for (let i = this.classList.length - 1; i >= 0; i--) {
+                    const className = this.classList[i];
                     if (className.startsWith('font-')) {
                         this.pnlEditor.classList.remove(className);
                     }
                 }
                 if(customBackgroundColor && backgroundColor)
-                    this.pnlEditor.style.setProperty('--background-main', backgroundColor);
+                    this.pnlEditor.style.setProperty('--custom-background-color', backgroundColor)
+                else
+                    this.pnlEditor.style.removeProperty('--custom-background-color');
                 if(customTextColor && textColor)
-                    this.pnlEditor.style.setProperty('--text-primary', textColor);
+                    this.pnlEditor.style.setProperty('--custom-text-color', textColor)
+                else
+                    this.pnlEditor.style.removeProperty('--custom-text-color');
                 if (customTextSize && textSize) {
                     this.pnlEditor.classList.add(`font-${textSize}`)
                 }
@@ -478,9 +481,9 @@ export default class Editor extends Module {
                             id="pnlEditor"
                             // maxWidth={1024}
                             minHeight="100vh"
-                            width="100%"
-                            margin={{top: 8, bottom: 8, left: 60, right: 60}}
-                            background={{color: 'var(--background-main)'}}
+                            width="90%"
+                            // margin={{top: 8, bottom: 8, left: 60, right: 60}}
+                            background={{color: 'var(--custom-background-color, var(--background-main))'}}
                             class="pnl-editor-wrapper"
                         >
                             <i-panel

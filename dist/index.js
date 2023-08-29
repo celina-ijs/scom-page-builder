@@ -1914,13 +1914,33 @@ define("@scom/scom-page-builder/command/updateRowSettings.ts", ["require", "expo
                     newValue.backgroundColor = (newConfig === null || newConfig === void 0 ? void 0 : newConfig.backgroundColor) || '';
                     newValue.customBackgroundColor = (_a = newConfig === null || newConfig === void 0 ? void 0 : newConfig.customBackgroundColor) !== null && _a !== void 0 ? _a : false;
                     const innerEl = this.element.querySelector('#pnlRowContainer');
-                    innerEl && innerEl.style.setProperty('--background-main', newValue.backgroundColor);
+                    if (innerEl) {
+                        if (newValue.customBackgroundColor)
+                            innerEl.style.setProperty('--custom-background-color', newValue.backgroundColor);
+                        else
+                            innerEl.style.removeProperty('--custom-background-color');
+                    }
                 }
+                else {
+                    const innerEl = this.element.querySelector('#pnlRowContainer');
+                    if (innerEl) {
+                        if (newValue.customBackgroundColor)
+                            innerEl.style.setProperty('--custom-background-color', newValue.backgroundColor);
+                        else
+                            innerEl.style.removeProperty('--custom-background-color');
+                    }
+                }
+                ;
                 if (updatedValues.includes('textColor')) {
                     newValue.textColor = (newConfig === null || newConfig === void 0 ? void 0 : newConfig.textColor) || '';
                     newValue.customTextColor = (_b = newConfig === null || newConfig === void 0 ? void 0 : newConfig.customTextColor) !== null && _b !== void 0 ? _b : false;
-                    this.element.style.setProperty('--text-primary', newValue.textColor);
+                    if (newValue.customTextColor)
+                        this.element.style.setProperty('--custom-text-color', newValue.textColor);
+                    else
+                        this.element.style.removeProperty('--custom-text-color');
                 }
+                else
+                    this.element.style.removeProperty('--custom-text-color');
                 newValue.customTextSize = (_c = newConfig === null || newConfig === void 0 ? void 0 : newConfig.customTextSize) !== null && _c !== void 0 ? _c : false;
                 this.element.updateChildren(Object.assign({}, newValue), Object.assign({}, (elemConfigs || {})));
             }
@@ -3261,48 +3281,72 @@ define("@scom/scom-page-builder/command/updatePageSetting.ts", ["require", "expo
             if (updatedValues.includes('backgroundImage')) {
                 components_10.application.EventBus.dispatch(index_24.EVENT.ON_UPDATE_PAGE_BG, { image: backgroundImage });
             }
-            const defaultBackgroundColor = Theme.background.main;
-            const defaultTextColor = Theme.text.primary;
-            // const defaultTextSize = 'md'
-            // let data: any = {
-            //   customBackgroundColor: customBackgroundColor,
-            //   backgroundColor: backgroundColor ?? defaultBackgroundColor,
-            //   customTextColor: customTextColor,
-            //   textColor: textColor ?? defaultTextColor,
-            //   customTextSize: customTextSize,
-            //   textSize: textSize ?? defaultTextSize
+            // const defaultBackgroundColor = Theme.background.main
+            // const defaultTextColor = Theme.text.primary
+            // // const defaultTextSize = 'md'
+            // // let data: any = {
+            // //   customBackgroundColor: customBackgroundColor,
+            // //   backgroundColor: backgroundColor ?? defaultBackgroundColor,
+            // //   customTextColor: customTextColor,
+            // //   textColor: textColor ?? defaultTextColor,
+            // //   customTextSize: customTextSize,
+            // //   textSize: textSize ?? defaultTextSize
+            // // }
+            // if (customBackgroundColor) {
+            //   if (updatedValues.includes('backgroundColor') || updatedValues.includes('customBackgroundColor')) {
+            //     this.element.style.setProperty('--background-main', backgroundColor);
+            //     // data.customBackgroundColor = customBackgroundColor
+            //     // data.backgroundColor = backgroundColor;
+            //   }
+            // } else {
+            //   this.element.style.setProperty('--background-main', defaultBackgroundColor);
             // }
+            // if (customTextColor) {
+            //   if (updatedValues.includes('textColor') || updatedValues.includes('customTextColor')) {
+            //     this.element.style.setProperty('--text-primary', textColor);
+            //     // data.customTextColor = customTextColor
+            //     // data.textColor = textColor;
+            const defaultTextSize = 'md';
+            let data = {
+                customBackgroundColor: customBackgroundColor,
+                backgroundColor: backgroundColor,
+                customTextColor: customTextColor,
+                textColor: textColor,
+                customTextSize: customTextSize,
+                textSize: textSize !== null && textSize !== void 0 ? textSize : defaultTextSize
+            };
             if (customBackgroundColor) {
-                if (updatedValues.includes('backgroundColor') || updatedValues.includes('customBackgroundColor')) {
-                    this.element.style.setProperty('--background-main', backgroundColor);
-                    // data.customBackgroundColor = customBackgroundColor
-                    // data.backgroundColor = backgroundColor;
+                if (updatedValues.includes('backgroundColor')) {
+                    this.element.style.setProperty('--custom-background-color', backgroundColor);
+                    data.customBackgroundColor = customBackgroundColor;
+                    data.backgroundColor = backgroundColor;
                 }
             }
             else {
-                this.element.style.setProperty('--background-main', defaultBackgroundColor);
+                this.element.style.removeProperty('--custom-background-color');
             }
             if (customTextColor) {
-                if (updatedValues.includes('textColor') || updatedValues.includes('customTextColor')) {
-                    this.element.style.setProperty('--text-primary', textColor);
-                    // data.customTextColor = customTextColor
-                    // data.textColor = textColor;
+                if (updatedValues.includes('textColor')) {
+                    this.element.style.setProperty('--custom-text-color', textColor);
+                    data.customTextColor = customTextColor;
+                    data.textColor = textColor;
                 }
+                else
+                    this.element.style.removeProperty('--custom-text-color');
             }
             else {
-                this.element.style.setProperty('--text-primary', defaultTextColor);
+                this.element.style.removeProperty('--custom-text-color');
             }
             if (customTextSize) {
                 if (updatedValues.includes('textSize') || updatedValues.includes('customTextSize')) {
                     this.element.classList.add(`font-${textSize}`);
-                    // data.textSize = textSize;
+                    data.textSize = textSize;
                 }
             }
             else {
                 this.element.classList.remove('font-xs', 'font-sm', 'font-md', 'font-lg', 'font-xl');
             }
-            // TODO: effected undo funtion
-            // application.EventBus.dispatch(EVENT.ON_UPDATE_PAGE_BG, {...data});
+            components_10.application.EventBus.dispatch(index_24.EVENT.ON_UPDATE_PAGE_BG, Object.assign({}, data));
             this.element.padding = {
                 left: plr,
                 right: plr,
@@ -4175,7 +4219,7 @@ define("@scom/scom-page-builder/dialogs/pageSettingsDialog.tsx", ["require", "ex
                     "backgroundImage": {
                         "title": "Background image",
                         "type": "string",
-                        "format": "data-url"
+                        "format": "data-cid"
                     },
                     "ptb": {
                         "title": "Section padding top / bottom (px)",
@@ -4790,7 +4834,7 @@ define("@scom/scom-page-builder/page/pageRow.css.ts", ["require", "exports", "@i
         transition: 'translate .3s ease-in',
         border: '1px solid transparent',
         boxSizing: 'border-box',
-        background: 'var(--background-main)',
+        backgroundColor: 'var(--custom-background-color, var(--background-main))',
         $nest: {
             '.page-row-container': {
                 borderRadius: 10,
@@ -5052,6 +5096,9 @@ define("@scom/scom-page-builder/page/pageRow.tsx", ["require", "exports", "@ijst
             this.updateRowConfig(config || (0, index_46.getPageConfig)());
             this.isCloned = ((_a = this.parentElement) === null || _a === void 0 ? void 0 : _a.nodeName) !== 'BUILDER-HEADER';
             this.isChanged = ((_b = this.parentElement) === null || _b === void 0 ? void 0 : _b.nodeName) !== 'BUILDER-HEADER';
+            if ((config === null || config === void 0 ? void 0 : config.customTextSize) && (config === null || config === void 0 ? void 0 : config.textSize)) {
+                this.classList.add(`font-${config.textSize}`);
+            }
             if (elements && elements.length > 0) {
                 for (let i = 0; i < elements.length; i++) {
                     await this.createNewElement(elements[i]);
@@ -5063,7 +5110,7 @@ define("@scom/scom-page-builder/page/pageRow.tsx", ["require", "exports", "@ijst
             this.toggleUI(hasData);
         }
         updateRowConfig(config) {
-            const { image = '', backgroundColor, backdropColor, backdropImage, border, borderColor, sectionWidth, margin, align, fullWidth, padding, textColor } = config || {};
+            const { image = '', customBackgroundColor, backgroundColor, backdropColor, backdropImage, border, borderColor, sectionWidth, margin, align, fullWidth, padding, textColor } = config || {};
             if (backgroundColor)
                 this.pnlRowContainer.style.setProperty('--background-main', backgroundColor);
             if (textColor)
@@ -5081,15 +5128,17 @@ define("@scom/scom-page-builder/page/pageRow.tsx", ["require", "exports", "@ijst
                 this.style.removeProperty('--background-main');
                 if (backdropImage)
                     this.background.image = backdropImage;
-                else if (backdropColor)
-                    this.style.setProperty('--background-main', backdropColor);
                 if (!image && !backdropImage)
                     this.background.image = undefined;
             }
             else {
                 this.pnlRowWrap.border.width = 0;
-                if (backgroundColor)
-                    this.style.setProperty('--background-main', backgroundColor);
+                // if (backgroundColor)
+                // this.background.color = backgroundColor;
+                if (customBackgroundColor)
+                    this.style.setProperty('--custom-background-color', backgroundColor);
+                else
+                    this.style.removeProperty('--custom-background-color');
                 this.background.image = '';
             }
             // if (backgroundColor) {
@@ -5187,12 +5236,20 @@ define("@scom/scom-page-builder/page/pageRow.tsx", ["require", "exports", "@ijst
         onDeleteRow() {
             const prependRow = this.previousElementSibling;
             const appendRow = this.nextElementSibling;
-            if (!prependRow && !appendRow) {
-                // Reject delete
-                return;
-            }
             const rowCmd = new index_47.UpdateRowCommand(this, this.parent, this.data, true, (prependRow === null || prependRow === void 0 ? void 0 : prependRow.id) || '', (appendRow === null || appendRow === void 0 ? void 0 : appendRow.id) || '');
             index_47.commandHistory.execute(rowCmd);
+            if (!prependRow && !appendRow) {
+                // create empty section
+                const newId = (0, index_48.generateUUID)();
+                const pageRows = this.parent.closest('ide-rows');
+                pageRows.setRows([
+                    {
+                        "id": `${newId}`,
+                        "row": 0,
+                        "elements": []
+                    }
+                ]);
+            }
         }
         onMoveUp() {
             this.actionsBar.classList.add('hidden');
@@ -5844,9 +5901,15 @@ define("@scom/scom-page-builder/page/pageRow.tsx", ["require", "exports", "@ijst
                             resetDragTarget();
                         }
                         else {
+                            const offsetLeft = Math.floor((startX + index_45.GAP_WIDTH) / (self.gridColumnWidth + index_45.GAP_WIDTH));
+                            let nearestFixedItem = dragDropResult.details.nearestPanel;
+                            let column = Number(nearestFixedItem.dataset.column);
+                            if (column - offsetLeft > 0) {
+                                nearestFixedItem = pageRow.querySelector(`.fixed-grid-item[data-column='${column - offsetLeft}']`);
+                            }
                             const dragCmd = (elementConfig) ?
-                                new index_47.AddElementCommand(self.getNewElementData(), true, false, dragDropResult.details.nearestPanel, pageRow) :
-                                new index_47.DragElementCommand(self.currentElement, dragDropResult.details.nearestPanel, true, false);
+                                new index_47.AddElementCommand(self.getNewElementData(), true, false, nearestFixedItem, pageRow) :
+                                new index_47.DragElementCommand(self.currentElement, nearestFixedItem, true, false);
                             dragCmd && index_47.commandHistory.execute(dragCmd);
                         }
                     }
@@ -5961,26 +6024,35 @@ define("@scom/scom-page-builder/page/pageRow.tsx", ["require", "exports", "@ijst
                     const parsedData = rowsConfig[id] ? JSON.parse(rowsConfig[id]) : {};
                     newConfig = Object.assign(Object.assign({}, newConfig), parsedData);
                 }
-                index_46.pageObject.updateSection(id, { config: Object.assign({}, newConfig) });
+                index_46.pageObject.updateSection(id, { config: JSON.parse(JSON.stringify(newConfig)) });
+                if (config.backgroundColor && config.customBackgroundColor)
+                    this.pnlRowContainer.style.setProperty('--custom-background-color', config.backgroundColor);
+                else
+                    this.pnlRowContainer.style.removeProperty('--custom-background-color');
+                if (config.customTextColor && config.textColor)
+                    this.pnlRowContainer.style.setProperty('--custom-text-color', config.textColor);
+                else
+                    this.pnlRowContainer.style.removeProperty('--custom-text-color');
+                Reflect.deleteProperty(newConfig, 'backgroundColor');
+                Reflect.deleteProperty(newConfig, 'textColor');
                 this.updateRowConfig(newConfig);
-                let newValues = {};
-                for (let prop in config) {
-                    if (prop === 'backgroundColor') {
-                        newValues.backgroundColor = newConfig.backgroundColor;
-                        newValues.customBackgroundColor = newConfig.customBackgroundColor;
-                    }
-                    else if (prop === 'textColor') {
-                        newValues.textColor = newConfig.textColor;
-                        newValues.customTextColor = newConfig.customTextColor;
-                    }
-                    else if (prop === 'textSize') {
-                        newValues.textSize = newConfig.textSize;
-                        newValues.customTextSize = newConfig.customTextSize;
-                    }
-                }
-                if (!(0, index_48.isEmpty)(newValues)) {
-                    this.updateChildren(newValues, elemsConfig);
-                }
+                // TODO: check
+                // let newValues: any = {}
+                // for (let prop in config) {
+                //     if (prop === 'backgroundColor') {
+                //         newValues.backgroundColor = newConfig.backgroundColor
+                //         newValues.customBackgroundColor = newConfig.customBackgroundColor
+                //     } else if (prop === 'textColor') {
+                //         newValues.textColor = newConfig.textColor
+                //         newValues.customTextColor = newConfig.customTextColor
+                //     } else if (prop === 'textSize') {
+                //         newValues.textSize = newConfig.textSize
+                //         newValues.customTextSize = newConfig.customTextSize
+                //     }
+                // }
+                // if (!isEmpty(newValues)) {
+                //     this.updateChildren(newValues, elemsConfig)
+                // }
                 // Reflect.deleteProperty(newConfig, 'backgroundColor')
                 // Reflect.deleteProperty(newConfig, 'textColor')
                 this.updateGridColumnWidth();
@@ -6062,7 +6134,7 @@ define("@scom/scom-page-builder/page/pageRow.tsx", ["require", "exports", "@ijst
             components_25.application.EventBus.dispatch(index_44.EVENT.ON_ADD_SECTION, { prependId, appendId });
         }
         render() {
-            return (this.$render("i-panel", { id: "pnlRowContainer", class: 'page-row-container', width: "100%", height: "100%", background: { color: Theme.background.main }, font: { color: Theme.text.primary } },
+            return (this.$render("i-panel", { id: "pnlRowContainer", class: 'page-row-container', width: "100%", height: "100%", background: { color: 'var(--custom-background-color, var(--background-main))' }, font: { color: 'var(--custom-text-color, var(--text-primary))' } },
                 this.$render("i-panel", { id: "pnlRowWrap", class: 'page-row', width: "100%", height: "100%" },
                     this.$render("i-button", { caption: "", icon: {
                             name: 'plus',
@@ -6100,7 +6172,7 @@ define("@scom/scom-page-builder/page/pageRow.tsx", ["require", "exports", "@ijst
                             }, class: "text-center" },
                             this.$render("i-label", { caption: "Drag Elements Here", font: {
                                     transform: 'uppercase',
-                                    color: Theme.text.primary,
+                                    color: 'var(--custom-text-color, var(--text-primary))',
                                     size: '1.25rem',
                                 }, opacity: 0.5 }))),
                     this.$render("i-grid-layout", { id: "pnlRow", width: "100%", height: "100%", maxWidth: "100%", maxHeight: "100%", position: "relative", class: "grid", opacity: 0 }),
@@ -7366,7 +7438,8 @@ define("@scom/scom-page-builder/page/pageRows.tsx", ["require", "exports", "@ijs
             this.clearRows();
             for (let i = 0; i < index_66.pageObject.sections.length; i++) {
                 const rowData = index_66.pageObject.sections[i];
-                const pageRow = (this.$render("ide-row", { maxWidth: "100%", maxHeight: "100%" }));
+                const pageRow = (this.$render("ide-row", { class: "i-page-section", background: { color: `var(--custom-background-color, var(--background-main))` }, font: { color: `var(--custom-text-color, var(--text-primary))` }, maxWidth: "100%", maxHeight: "100%" }));
+                const { backgroundColor, textColor, customBackgroundColor, customTextColor, } = rowData.config || {};
                 if (!this._readonly) {
                     pageRow.border = { top: { width: '1px', style: 'dashed', color: Theme.divider } };
                     this.initDragEvent(pageRow);
@@ -7374,18 +7447,21 @@ define("@scom/scom-page-builder/page/pageRows.tsx", ["require", "exports", "@ijs
                 const isInit = i == 0 && index_66.pageObject.sections.length == 1;
                 pageRow.visible = isInit ? true : !!((_a = rowData === null || rowData === void 0 ? void 0 : rowData.elements) === null || _a === void 0 ? void 0 : _a.length);
                 pageRow.parent = this.pnlRows;
+                if (customBackgroundColor && backgroundColor)
+                    pageRow.style.setProperty('--custom-background-color', backgroundColor);
+                if (customTextColor && textColor)
+                    pageRow.style.setProperty('--custom-text-color', textColor);
                 this.pnlRows.append(pageRow);
                 await pageRow.setData(rowData);
             }
         }
         async appendRow(rowData, prependId) {
-            var _a;
             const pageRow = (this.$render("ide-row", { maxWidth: "100%", maxHeight: "100%" }));
             if (!this._readonly) {
                 pageRow.border = { top: { width: '1px', style: 'dashed', color: Theme.divider } };
                 this.initDragEvent(pageRow);
             }
-            pageRow.visible = !!((_a = rowData === null || rowData === void 0 ? void 0 : rowData.elements) === null || _a === void 0 ? void 0 : _a.length);
+            pageRow.visible = true; // !!rowData?.elements?.length;
             const addRowCmd = new index_65.UpdateRowCommand(pageRow, this.pnlRows, rowData, false, prependId);
             index_65.commandHistory.execute(addRowCmd);
             await pageRow.setData(rowData);
@@ -7900,13 +7976,10 @@ define("@scom/scom-page-builder/page/pageMenu.css.ts", ["require", "exports", "@
         }
     });
     exports.menuCardStyle = components_35.Styles.style({
-        cursor: 'grab',
+        cursor: 'pointer',
         opacity: 1,
         transition: '0.3s',
         $nest: {
-            '&.is-dragging': {
-                opacity: 0.7
-            },
             '&:hover': {
                 backgroundColor: "#b8e4f2"
             },
@@ -7959,6 +8032,7 @@ define("@scom/scom-page-builder/page/pageMenu.tsx", ["require", "exports", "@ijs
         constructor() {
             super(...arguments);
             this.isEditing = false;
+            this.noDataTxt = "No section";
         }
         init() {
             super.init();
@@ -7992,6 +8066,7 @@ define("@scom/scom-page-builder/page/pageMenu.tsx", ["require", "exports", "@ijs
                 this.draggingSectionId = undefined;
             });
             this.addEventListener('dragover', (event) => {
+                event.preventDefault();
                 if (!this.draggingSectionId) {
                     event.preventDefault();
                     return;
@@ -8078,6 +8153,7 @@ define("@scom/scom-page-builder/page/pageMenu.tsx", ["require", "exports", "@ijs
             }
         }
         renderMenu() {
+            var _a;
             this.pnlMenu.clearInnerHTML();
             const sections = index_68.pageObject.getNonNullSections();
             const items = sections.map((section) => {
@@ -8086,14 +8162,23 @@ define("@scom/scom-page-builder/page/pageMenu.tsx", ["require", "exports", "@ijs
                     rowId: section.id.replace("row-", "")
                 };
             });
+            if (!items.length) {
+                const txt = (this.$render("i-hstack", { verticalAlignment: "center", horizontalAlignment: 'start', width: "100%", overflow: "hidden" },
+                    this.$render("i-label", { caption: this.noDataTxt, font: { size: '16px', color: '#3b3838', weight: 530 }, padding: { top: 8, bottom: 8, left: 8, right: 8 }, maxHeight: 34, overflow: "hidden" })));
+                this.pnlMenu.appendChild(txt);
+                return;
+            }
+            const activeElm = document.querySelector('ide-toolbar.active') || document.querySelector('ide-row.active');
+            const activeSectionId = (_a = activeElm === null || activeElm === void 0 ? void 0 : activeElm.closest('ide-row')) === null || _a === void 0 ? void 0 : _a.id.replace('row-', "");
             // set the titles here
             const dropLine = (this.$render("i-panel", { id: `menuDropLine-0`, width: '100%', height: '5px' }));
             this.pnlMenu.appendChild(dropLine);
             for (let i = 0; i < items.length; i++) {
+                const isActive = activeSectionId == items[i].rowId;
                 const menuCard = (this.$render("i-hstack", { id: "menuCard", class: pageMenu_css_1.menuCardStyle, verticalAlignment: "center", horizontalAlignment: 'space-between', width: "100%", border: { radius: 5 }, overflow: "hidden", onClick: () => this.goToSection(items[i].rowId) },
                     this.$render("i-hstack", { verticalAlignment: "center", horizontalAlignment: 'start' },
-                        this.$render("i-label", { id: "cardDot", caption: "•", font: { size: '16px', color: '#3b3838', weight: 530 }, padding: { top: 8, bottom: 8, left: 8, right: 8 }, maxHeight: 34, overflow: "hidden" }),
-                        this.$render("i-label", { id: "cardTitle", caption: items[i].caption, font: { size: '16px', color: '#3b3838', weight: 530 }, padding: { top: 8, bottom: 8, left: 8, right: 8 }, maxHeight: 34, overflow: "hidden" }),
+                        this.$render("i-label", { id: "cardDot", caption: "•", font: { size: '16px', color: '#3b3838', weight: 530 }, padding: { top: 8, bottom: 8, left: 8, right: 8 }, maxHeight: 34, overflow: "hidden", class: isActive ? "focused-card" : "" }),
+                        this.$render("i-label", { id: "cardTitle", caption: items[i].caption, font: { size: '16px', color: '#3b3838', weight: 530 }, padding: { top: 8, bottom: 8, left: 8, right: 8 }, maxHeight: 34, class: isActive ? "focused-card" : "", overflow: "hidden" }),
                         this.$render("i-input", { id: "cardInput", visible: false, width: '90%', height: '40px', padding: { left: '0.5rem', top: '0.5rem', bottom: '0.5rem', right: '0.5rem' } })),
                     this.$render("i-icon", { id: "cardRenameBtn", name: 'pen', fill: 'var(--colors-primary-main)', width: 28, height: 28, padding: { top: 7, bottom: 7, left: 7, right: 7 }, margin: { right: 4 }, class: "pointer iconButton", visible: false, tooltip: { content: "Rename", placement: "top" }, onClick: () => this.onClickRenameBtn(items[i].rowId) }),
                     this.$render("i-hstack", { id: "editBtnStack", verticalAlignment: "center", visible: false },
@@ -8291,7 +8376,7 @@ define("@scom/scom-page-builder/page/pageSidebar.tsx", ["require", "exports", "@
             });
             return capitalizedStrings.join(' ');
         }
-        renderMenu() {
+        createMenu() {
             this.pnlWidgets.clearInnerHTML();
             const menu = (this.$render("i-scom-page-builder-menu", null));
             this.pnlWidgets.appendChild(menu);
@@ -8350,7 +8435,7 @@ define("@scom/scom-page-builder/page/pageSidebar.tsx", ["require", "exports", "@
             this.mdWidget.width = 'auto';
             this.pnlWidgets.removeEventListener("dragstart", this.pnlWidgetsDragStartEvent);
             this.mdWidget.parent = target;
-            this.renderMenu();
+            this.createMenu();
             this.mdWidget.visible = true;
         }
         initDrag(module, data) {
@@ -8800,7 +8885,7 @@ define("@scom/scom-page-builder/builder/builderFooter.tsx", ["require", "exports
             var _a;
             this.pnlFooterMain.clearInnerHTML();
             this.showAddStack = ((_a = this._elements) === null || _a === void 0 ? void 0 : _a.length) === 0 && !this._image;
-            this.pnlFooter.background = this.showAddStack ? { color: 'var(--background-main)', image: '' } : { image: this._image };
+            this.pnlFooter.background = this.showAddStack ? { color: 'var(--custom-background-color, var(background-main))', image: '' } : { image: this._image };
             this.pnlEditOverlay.visible = !this.showAddStack;
             this.pnlEditOverlay.classList.remove('flex');
             this.pnlConfig.visible = !this.showAddStack;
@@ -8930,6 +9015,7 @@ define("@scom/scom-page-builder/index.css.ts", ["require", "exports", "@ijstech/
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
                 boxShadow: 'rgba(50, 50, 105, 0.15) 0px 2px 5px 0px, rgba(0, 0, 0, 0.05) 0px 1px 1px 0px',
+                margin: '50px auto !important'
             },
             '.custom-input input': {
                 paddingLeft: 10
@@ -9035,12 +9121,6 @@ define("@scom/scom-page-builder", ["require", "exports", "@ijstech/components", 
         set theme(value) {
             this._theme = value !== null && value !== void 0 ? value : 'light';
             (0, index_88.setTheme)(this.theme);
-            const bgColor = (0, index_88.getBackgroundColor)(this.theme);
-            const fontColor = (0, index_88.getFontColor)(this.theme);
-            const dividerColor = (0, index_88.getDivider)(this.theme);
-            this.pnlEditor.style.setProperty('--background-main', bgColor);
-            this.pnlEditor.style.setProperty('--text-primary', fontColor);
-            this.pnlEditor.style.setProperty('--divider', dividerColor);
         }
         get commandHistoryIndex() {
             return index_90.commandHistory.commandIndex;
@@ -9178,7 +9258,7 @@ define("@scom/scom-page-builder", ["require", "exports", "@ijstech/components", 
                 index_90.commandHistory.redo();
             }
         }
-        init() {
+        async init() {
             const rootDir = this.getAttribute('rootDir', true);
             if (rootDir)
                 this.setRootDir(rootDir);
@@ -9191,7 +9271,9 @@ define("@scom/scom-page-builder", ["require", "exports", "@ijstech/components", 
             const onFetchComponents = this.getAttribute('onFetchComponents', true);
             if (onFetchComponents)
                 this.onFetchComponents = onFetchComponents.bind(this);
-            super.init();
+            await super.init();
+            this.style.setProperty('--custom-background-color', '#ffffff');
+            this.style.setProperty('--custom-text-color', '#000000');
             this.initEventListeners();
             this.initData();
             this.theme = this.getAttribute('theme', true);
@@ -9229,14 +9311,6 @@ define("@scom/scom-page-builder", ["require", "exports", "@ijstech/components", 
             const config = (0, index_88.getDefaultPageConfig)();
             const { backgroundColor, margin, textColor, textSize, customTextSize, customBackgroundColor, customTextColor, backgroundImage, ptb, plr, sectionWidth } = config;
             components_43.application.EventBus.dispatch(index_87.EVENT.ON_UPDATE_PAGE_BG, Object.assign({}, config));
-            // if (backgroundImage) {
-            //     this.style.setProperty('--background-main', `url("${backgroundImage}") center center fixed`);
-            // } else if (customBackgroundColor && backgroundColor) {
-            //     this.style.setProperty('--background-main', backgroundColor);
-            // }
-            // if (customTextSize && textSize && ["xs", "sm", "md", "lg", "xl"].includes(textSize)) {
-            //     this.pnlEditor.classList.add(`font-${textSize}`);
-            // }
             if (this.pnlEditor) {
                 this.pnlEditor.padding = {
                     left: plr,
@@ -9248,6 +9322,19 @@ define("@scom/scom-page-builder", ["require", "exports", "@ijstech/components", 
                 const marginStyle = (0, index_88.getMargin)(margin);
                 this.pnlEditor.margin = marginStyle;
                 this.pnlEditor.style.width = `calc(100% - (2 * ${marginStyle.left}))`;
+                if (backgroundImage) {
+                    const ipfsUrl = 'https://ipfs.scom.dev/ipfs';
+                    this.pnlEditor.style.setProperty('--custom-background-color', `url("${ipfsUrl}/${backgroundImage}") center center fixed`);
+                }
+                else if (customBackgroundColor && backgroundColor) {
+                    this.pnlEditor.style.setProperty('--custom-background-color', backgroundColor);
+                }
+                else
+                    this.pnlEditor.style.removeProperty('--custom-background-color');
+                if (customTextColor && textColor)
+                    this.pnlEditor.style.setProperty('--custom-text-color', textColor);
+                else
+                    this.pnlEditor.style.removeProperty('--custom-text-color');
             }
         }
         onHide() {
@@ -9265,18 +9352,23 @@ define("@scom/scom-page-builder", ["require", "exports", "@ijstech/components", 
             this.events.push(components_43.application.EventBus.register(this, index_87.EVENT.ON_FETCH_COMPONENTS, this.onSearch));
             this.events.push(components_43.application.EventBus.register(this, index_87.EVENT.ON_UPDATE_PAGE_BG, async (data) => {
                 const { customBackgroundColor, customTextColor, customTextSize, backgroundColor, textColor, textSize } = data;
+                const ipfsUrl = `https://ipfs.scom.dev/ipfs`;
                 if (data.image)
-                    this.pnlEditor.style.backgroundImage = `url(${data.image})`;
-                for (let i = this.pnlEditor.classList.length - 1; i >= 0; i--) {
-                    const className = this.pnlEditor.classList[i];
+                    this.pnlEditor.style.backgroundImage = `url("${ipfsUrl}/${data.image}")`;
+                for (let i = this.classList.length - 1; i >= 0; i--) {
+                    const className = this.classList[i];
                     if (className.startsWith('font-')) {
                         this.pnlEditor.classList.remove(className);
                     }
                 }
                 if (customBackgroundColor && backgroundColor)
-                    this.pnlEditor.style.setProperty('--background-main', backgroundColor);
+                    this.pnlEditor.style.setProperty('--custom-background-color', backgroundColor);
+                else
+                    this.pnlEditor.style.removeProperty('--custom-background-color');
                 if (customTextColor && textColor)
-                    this.pnlEditor.style.setProperty('--text-primary', textColor);
+                    this.pnlEditor.style.setProperty('--custom-text-color', textColor);
+                else
+                    this.pnlEditor.style.removeProperty('--custom-text-color');
                 if (customTextSize && textSize) {
                     this.pnlEditor.classList.add(`font-${textSize}`);
                 }
@@ -9319,7 +9411,9 @@ define("@scom/scom-page-builder", ["require", "exports", "@ijstech/components", 
                         width: "100%", horizontalAlignment: 'center' },
                         this.$render("i-panel", { id: "pnlEditor", 
                             // maxWidth={1024}
-                            minHeight: "100vh", width: "100%", margin: { top: 8, bottom: 8, left: 60, right: 60 }, background: { color: 'var(--background-main)' }, class: "pnl-editor-wrapper" },
+                            minHeight: "100vh", width: "90%", 
+                            // margin={{top: 8, bottom: 8, left: 60, right: 60}}
+                            background: { color: 'var(--custom-background-color, var(--background-main))' }, class: "pnl-editor-wrapper" },
                             this.$render("i-panel", { id: "contentWrapper", padding: { bottom: '12rem' }, minHeight: "calc((100vh - 6rem) - 12rem)" },
                                 this.$render("ide-rows", { id: "pageRows", draggable: true })),
                             this.$render("builder-footer", { id: "builderFooter" })))),

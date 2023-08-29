@@ -200,7 +200,8 @@ export class PageRow extends Module {
         this.updateRowConfig(config || getPageConfig());
         this.isCloned = this.parentElement?.nodeName !== 'BUILDER-HEADER';
         this.isChanged = this.parentElement?.nodeName !== 'BUILDER-HEADER';
-
+        if (config?.customTextSize && config?.textSize){
+            this.classList.add(`font-${config.textSize}`)}
         if (elements && elements.length > 0) {
             for (let i = 0; i < elements.length; i++) {
                 await this.createNewElement(elements[i]);
@@ -215,6 +216,7 @@ export class PageRow extends Module {
     updateRowConfig(config: IPageSectionConfig) {
         const {
             image = '',
+            customBackgroundColor,
             backgroundColor,
             backdropColor,
             backdropImage,
@@ -242,13 +244,15 @@ export class PageRow extends Module {
             this.style.removeProperty('--background-main');
             if (backdropImage)
                 this.background.image = backdropImage;
-            else if (backdropColor)
-                this.style.setProperty('--background-main', backdropColor)
             if (!image && !backdropImage) this.background.image = undefined
         } else {
             this.pnlRowWrap.border.width = 0
-            if (backgroundColor)
-                this.style.setProperty('--background-main', backgroundColor)
+            // if (backgroundColor)
+                // this.background.color = backgroundColor;
+            if (customBackgroundColor)
+                this.style.setProperty('--custom-background-color', backgroundColor)
+            else
+                this.style.removeProperty('--custom-background-color')
             this.background.image = ''
         }
         // if (backgroundColor) {
@@ -350,12 +354,20 @@ export class PageRow extends Module {
     onDeleteRow() {
         const prependRow = this.previousElementSibling;
         const appendRow = this.nextElementSibling;
-        if(!prependRow && !appendRow) {
-            // Reject delete
-            return;
-        }
         const rowCmd = new UpdateRowCommand(this, this.parent, this.data, true, prependRow?.id || '', appendRow?.id || '');
         commandHistory.execute(rowCmd);
+        if(!prependRow && !appendRow) {
+            // create empty section
+            const newId = generateUUID();
+            const pageRows = this.parent.closest('ide-rows') as any;
+            pageRows.setRows([
+                {
+                  "id": `${newId}`,
+                  "row": 0,
+                  "elements": []
+                }
+            ]);
+        }
     }
 
     onMoveUp() {
@@ -1096,16 +1108,23 @@ export class PageRow extends Module {
                         dragCmd && commandHistory.execute(dragCmd);
                         resetDragTarget();
                     } else {
+                        const offsetLeft = Math.floor((startX + GAP_WIDTH) / (self.gridColumnWidth + GAP_WIDTH));
+                        let nearestFixedItem = dragDropResult.details.nearestPanel;
+                        let column = Number(nearestFixedItem.dataset.column);
+                        if (column - offsetLeft > 0) {
+                            nearestFixedItem = pageRow.querySelector(`.fixed-grid-item[data-column='${column - offsetLeft}']`)
+                        }
+
                         const dragCmd = (elementConfig)? 
                             new AddElementCommand(
                                 self.getNewElementData(),
                                 true, false,
-                                dragDropResult.details.nearestPanel as Control, 
+                                nearestFixedItem as Control, 
                                 pageRow
                             ) : 
                             new DragElementCommand(
                                 self.currentElement, 
-                                dragDropResult.details.nearestPanel as Control, 
+                                nearestFixedItem as Control, 
                                 true, false
                             );
                         dragCmd && commandHistory.execute(dragCmd);
@@ -1229,24 +1248,38 @@ export class PageRow extends Module {
                 const parsedData = rowsConfig[id] ? JSON.parse(rowsConfig[id]) : {};
                 newConfig = {...newConfig, ...parsedData};
             }
-            pageObject.updateSection(id, {config: {...newConfig}});
+            pageObject.updateSection(id, {config: JSON.parse(JSON.stringify(newConfig))});
+
+            if (config.backgroundColor && config.customBackgroundColor)
+                this.pnlRowContainer.style.setProperty('--custom-background-color', config.backgroundColor)
+            else
+                this.pnlRowContainer.style.removeProperty('--custom-background-color')
+            if (config.customTextColor && config.textColor)
+                this.pnlRowContainer.style.setProperty('--custom-text-color', config.textColor)
+            else
+                this.pnlRowContainer.style.removeProperty('--custom-text-color')
+            Reflect.deleteProperty(newConfig, 'backgroundColor')
+            Reflect.deleteProperty(newConfig, 'textColor')
             this.updateRowConfig(newConfig);
-            let newValues: any = {}
-            for (let prop in config) {
-                if (prop === 'backgroundColor') {
-                    newValues.backgroundColor = newConfig.backgroundColor
-                    newValues.customBackgroundColor = newConfig.customBackgroundColor
-                } else if (prop === 'textColor') {
-                    newValues.textColor = newConfig.textColor
-                    newValues.customTextColor = newConfig.customTextColor
-                } else if (prop === 'textSize') {
-                    newValues.textSize = newConfig.textSize
-                    newValues.customTextSize = newConfig.customTextSize
-                }
-            }
-            if (!isEmpty(newValues)) {
-                this.updateChildren(newValues, elemsConfig)
-            }
+
+            // TODO: check
+            // let newValues: any = {}
+            // for (let prop in config) {
+            //     if (prop === 'backgroundColor') {
+            //         newValues.backgroundColor = newConfig.backgroundColor
+            //         newValues.customBackgroundColor = newConfig.customBackgroundColor
+            //     } else if (prop === 'textColor') {
+            //         newValues.textColor = newConfig.textColor
+            //         newValues.customTextColor = newConfig.customTextColor
+            //     } else if (prop === 'textSize') {
+            //         newValues.textSize = newConfig.textSize
+            //         newValues.customTextSize = newConfig.customTextSize
+            //     }
+            // }
+            // if (!isEmpty(newValues)) {
+            //     this.updateChildren(newValues, elemsConfig)
+            // }
+
             // Reflect.deleteProperty(newConfig, 'backgroundColor')
             // Reflect.deleteProperty(newConfig, 'textColor')
             this.updateGridColumnWidth();
@@ -1335,8 +1368,8 @@ export class PageRow extends Module {
                 id="pnlRowContainer"
                 class={'page-row-container'}
                 width="100%" height="100%"
-                background={{color: Theme.background.main}}
-                font={{color: Theme.text.primary}}
+                background={{color: 'var(--custom-background-color, var(--background-main))'}}
+                font={{color: 'var(--custom-text-color, var(--text-primary))'}}
             >
                 <i-panel
                     id="pnlRowWrap"
@@ -1463,7 +1496,7 @@ export class PageRow extends Module {
                                 caption="Drag Elements Here"
                                 font={{
                                     transform: 'uppercase',
-                                    color: Theme.text.primary,
+                                    color: 'var(--custom-text-color, var(--text-primary))',
                                     size: '1.25rem',
                                 }}
                                 opacity={0.5}

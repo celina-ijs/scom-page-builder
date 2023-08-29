@@ -57,46 +57,70 @@ export class UpdatePageSettingsCommand implements ICommand {
     if (updatedValues.includes('backgroundImage')) {
       application.EventBus.dispatch(EVENT.ON_UPDATE_PAGE_BG, {image: backgroundImage});
     }
-    const defaultBackgroundColor = Theme.background.main
-    const defaultTextColor = Theme.text.primary
-    // const defaultTextSize = 'md'
-    // let data: any = {
-    //   customBackgroundColor: customBackgroundColor,
-    //   backgroundColor: backgroundColor ?? defaultBackgroundColor,
-    //   customTextColor: customTextColor,
-    //   textColor: textColor ?? defaultTextColor,
-    //   customTextSize: customTextSize,
-    //   textSize: textSize ?? defaultTextSize
+    // const defaultBackgroundColor = Theme.background.main
+    // const defaultTextColor = Theme.text.primary
+    // // const defaultTextSize = 'md'
+    // // let data: any = {
+    // //   customBackgroundColor: customBackgroundColor,
+    // //   backgroundColor: backgroundColor ?? defaultBackgroundColor,
+    // //   customTextColor: customTextColor,
+    // //   textColor: textColor ?? defaultTextColor,
+    // //   customTextSize: customTextSize,
+    // //   textSize: textSize ?? defaultTextSize
+    // // }
+    // if (customBackgroundColor) {
+    //   if (updatedValues.includes('backgroundColor') || updatedValues.includes('customBackgroundColor')) {
+    //     this.element.style.setProperty('--background-main', backgroundColor);
+    //     // data.customBackgroundColor = customBackgroundColor
+    //     // data.backgroundColor = backgroundColor;
+    //   }
+    // } else {
+    //   this.element.style.setProperty('--background-main', defaultBackgroundColor);
     // }
+    // if (customTextColor) {
+    //   if (updatedValues.includes('textColor') || updatedValues.includes('customTextColor')) {
+    //     this.element.style.setProperty('--text-primary', textColor);
+    //     // data.customTextColor = customTextColor
+    //     // data.textColor = textColor;
+    const defaultTextSize = 'md'
+    let data: any = {
+      customBackgroundColor: customBackgroundColor,
+      backgroundColor: backgroundColor,
+      customTextColor: customTextColor,
+      textColor: textColor,
+      customTextSize: customTextSize,
+      textSize: textSize ?? defaultTextSize
+    }
     if (customBackgroundColor) {
-      if (updatedValues.includes('backgroundColor') || updatedValues.includes('customBackgroundColor')) {
-        this.element.style.setProperty('--background-main', backgroundColor);
-        // data.customBackgroundColor = customBackgroundColor
-        // data.backgroundColor = backgroundColor;
+      if (updatedValues.includes('backgroundColor')) {
+        this.element.style.setProperty('--custom-background-color', backgroundColor);
+        data.customBackgroundColor = customBackgroundColor
+        data.backgroundColor = backgroundColor;
       }
     } else {
-      this.element.style.setProperty('--background-main', defaultBackgroundColor);
+      this.element.style.removeProperty('--custom-background-color');
     }
     if (customTextColor) {
-      if (updatedValues.includes('textColor') || updatedValues.includes('customTextColor')) {
-        this.element.style.setProperty('--text-primary', textColor);
-        // data.customTextColor = customTextColor
-        // data.textColor = textColor;
+      if (updatedValues.includes('textColor')) {
+        this.element.style.setProperty('--custom-text-color', textColor);
+        data.customTextColor = customTextColor
+        data.textColor = textColor;
       }
+      else
+        this.element.style.removeProperty('--custom-text-color');
     } else {
-      this.element.style.setProperty('--text-primary', defaultTextColor);
+      this.element.style.removeProperty('--custom-text-color');
     }
     if (customTextSize) {
       if (updatedValues.includes('textSize') || updatedValues.includes('customTextSize')) {
         this.element.classList.add(`font-${textSize}`);
-        // data.textSize = textSize;
+        data.textSize = textSize;
       }
     }
     else {
       this.element.classList.remove('font-xs', 'font-sm', 'font-md', 'font-lg', 'font-xl');
     }
-    // TODO: effected undo funtion
-    // application.EventBus.dispatch(EVENT.ON_UPDATE_PAGE_BG, {...data});
+    application.EventBus.dispatch(EVENT.ON_UPDATE_PAGE_BG, {...data});
 
     this.element.padding = {
       left: plr,
