@@ -132,9 +132,9 @@ export default class Editor extends Module {
         const bgColor = getBackgroundColor(this.theme);
         const fontColor = getFontColor(this.theme);
         const dividerColor = getDivider(this.theme);
-        this.pnlEditor.style.setProperty('--builder-bg', bgColor);
-        this.pnlEditor.style.setProperty('--builder-color', fontColor);
-        this.pnlEditor.style.setProperty('--builder-divider', dividerColor);
+        this.pnlEditor.style.setProperty('--background-main', bgColor);
+        this.pnlEditor.style.setProperty('--text-primary', fontColor);
+        this.pnlEditor.style.setProperty('--divider', dividerColor);
     }
 
     get commandHistoryIndex(): number {
@@ -336,9 +336,9 @@ export default class Editor extends Module {
         } = config;
         application.EventBus.dispatch(EVENT.ON_UPDATE_PAGE_BG, {...config});
         // if (backgroundImage) {
-        //     this.style.setProperty('--builder-bg', `url("${backgroundImage}") center center fixed`);
+        //     this.style.setProperty('--background-main', `url("${backgroundImage}") center center fixed`);
         // } else if (customBackgroundColor && backgroundColor) {
-        //     this.style.setProperty('--builder-bg', backgroundColor);
+        //     this.style.setProperty('--background-main', backgroundColor);
         // }
 
         // if (customTextSize && textSize && ["xs", "sm", "md", "lg", "xl"].includes(textSize)) {
@@ -399,9 +399,9 @@ export default class Editor extends Module {
                     }
                 }
                 if(customBackgroundColor && backgroundColor)
-                    this.pnlEditor.style.setProperty('--builder-bg', backgroundColor);
+                    this.pnlEditor.style.setProperty('--background-main', backgroundColor);
                 if(customTextColor && textColor)
-                    this.pnlEditor.style.setProperty('--builder-color', textColor);
+                    this.pnlEditor.style.setProperty('--text-primary', textColor);
                 if (customTextSize && textSize) {
                     this.pnlEditor.classList.add(`font-${textSize}`)
                 }
@@ -480,7 +480,7 @@ export default class Editor extends Module {
                             minHeight="100vh"
                             width="100%"
                             margin={{top: 8, bottom: 8, left: 60, right: 60}}
-                            background={{color: 'var(--builder-bg)'}}
+                            background={{color: 'var(--background-main)'}}
                             class="pnl-editor-wrapper"
                         >
                             <i-panel

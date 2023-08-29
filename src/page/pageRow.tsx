@@ -27,7 +27,7 @@ import {
     UngroupElementCommand,
 } from '../command/index';
 import {IDEToolbar} from '../common/toolbar';
-import {generateUUID, checkDragDropResult, findNearestSectionInRow, getDropFrontBackResult} from '../utility/index';
+import {generateUUID, checkDragDropResult, findNearestSectionInRow, getDropFrontBackResult, isEmpty} from '../utility/index';
 import {IMergeType} from '../command/index';
 const Theme = Styles.Theme.ThemeVars;
 
@@ -131,8 +131,6 @@ export class PageRow extends Module {
                 class={ROW_TOP_CLASS}
             ></i-panel>
         );
-        this.style.setProperty('--row-background', 'var(--builder-bg)')
-        this.style.setProperty('--row-font_color', 'var(--builder-color)')
     }
 
     toggleUI(value: boolean) {
@@ -227,10 +225,12 @@ export class PageRow extends Module {
             align,
             fullWidth,
             padding,
-            ptb,
-            plr,
             textColor
         } = config || {};
+        if (backgroundColor)
+            this.pnlRowContainer.style.setProperty('--background-main', backgroundColor);
+        if (textColor)
+            this.pnlRowContainer.style.setProperty('--text-primary', textColor);
         if (!fullWidth) {
             if (image) this.background.image = image;
             if (border) {
@@ -239,16 +239,16 @@ export class PageRow extends Module {
                 this.pnlRowWrap.border.width = 0
             }
             // this.background.color = 'transparent';
+            this.style.removeProperty('--background-main');
             if (backdropImage)
                 this.background.image = backdropImage;
-            else // if (backdropColor) this.background.color = backdropColor;
-                this.style.setProperty('--row-background', backdropColor || 'var(--builder-bg)')
+            else if (backdropColor)
+                this.style.setProperty('--background-main', backdropColor)
             if (!image && !backdropImage) this.background.image = undefined
         } else {
             this.pnlRowWrap.border.width = 0
-            // if (backgroundColor)
-                // this.background.color = backgroundColor;
-            this.style.setProperty('--row-background', backgroundColor || 'var(--builder-bg)')
+            if (backgroundColor)
+                this.style.setProperty('--background-main', backgroundColor)
             this.background.image = ''
         }
         // if (backgroundColor) {
@@ -266,6 +266,27 @@ export class PageRow extends Module {
         // }
         this.pnlRowWrap.padding = padding || {};
         if (align) this.updateAlign();
+    }
+
+    updateChildren(newValue: any, elemConfigs: {[key: string]: string} = {}) {
+        const toolbars = this.querySelectorAll('ide-toolbar');
+        for (let elm of toolbars) {
+            const toolbar = elm as IDEToolbar
+            const elmId = (toolbar?.module?.id || '').replace('component-', '');
+            if (elemConfigs[elmId]) {
+                const {backgroundColor, textColor, textSize, settingBgColor} = JSON.parse(elemConfigs[elmId]).tag || {}
+                if (newValue.backgroundColor !== undefined && backgroundColor !== undefined) {
+                    newValue.backgroundColor = backgroundColor
+                }
+                if (newValue.textColor !== undefined && textColor !== undefined) {
+                    newValue.textColor = textColor
+                }
+                if (newValue.textSize !== undefined && textSize !== undefined) {
+                    newValue.textSize = textSize
+                }
+            }
+            toolbar.updateUI(newValue);
+        }
     }
 
     private onOpenRowSettingsDialog() {
@@ -1199,7 +1220,7 @@ export class PageRow extends Module {
         application.EventBus.register(this, EVENT.ON_SET_DRAG_ELEMENT, async (el: any) => (this.currentElement = el));
         application.EventBus.register(this, EVENT.ON_SET_DRAG_TOOLBAR, async (el: any) => (this.currentToolbar = el));
         application.EventBus.register(this, EVENT.ON_UPDATE_PAGE_CONFIG, async (data: any) => {
-            const {config, rowsConfig} = data;
+            const {config, rowsConfig, elemsConfig} = data;
             if (!config) return;
             const id = this.id.replace('row-', '');
             const sectionConfig = pageObject.getRowConfig(id) || {};
@@ -1209,22 +1230,25 @@ export class PageRow extends Module {
                 newConfig = {...newConfig, ...parsedData};
             }
             pageObject.updateSection(id, {config: {...newConfig}});
-            if (config.backgroundColor) {}
-                this.pnlRowContainer.style.setProperty('--row-background', newConfig.backgroundColor);
-            if (config.textColor)
-                this.pnlRowContainer.style.setProperty('--row-font_color', newConfig.textColor);
-            if (config.backgroundColor || config.textColor || config.textSize) {
-                const config =  {...(newConfig || {})}
-                const { backgroundColor, customBackgroundColor, customTextColor, textColor, customTextSize, textSize } = config;
-                const data = { backgroundColor, customBackgroundColor, customTextColor, textColor, customTextSize, textSize }
-                const toolbars = this.querySelectorAll('ide-toolbar');
-                for (let toolbar of toolbars) {
-                    (toolbar as any).updateUI(data);
+            this.updateRowConfig(newConfig);
+            let newValues: any = {}
+            for (let prop in config) {
+                if (prop === 'backgroundColor') {
+                    newValues.backgroundColor = newConfig.backgroundColor
+                    newValues.customBackgroundColor = newConfig.customBackgroundColor
+                } else if (prop === 'textColor') {
+                    newValues.textColor = newConfig.textColor
+                    newValues.customTextColor = newConfig.customTextColor
+                } else if (prop === 'textSize') {
+                    newValues.textSize = newConfig.textSize
+                    newValues.customTextSize = newConfig.customTextSize
                 }
+            }
+            if (!isEmpty(newValues)) {
+                this.updateChildren(newValues, elemsConfig)
             }
             // Reflect.deleteProperty(newConfig, 'backgroundColor')
             // Reflect.deleteProperty(newConfig, 'textColor')
-            this.updateRowConfig(newConfig);
             this.updateGridColumnWidth();
         });
         application.EventBus.register(this, EVENT.ON_SHOW_BOTTOM_BLOCK, (targetRow: PageRow) => {
@@ -1311,8 +1335,8 @@ export class PageRow extends Module {
                 id="pnlRowContainer"
                 class={'page-row-container'}
                 width="100%" height="100%"
-                background={{color: 'var(--row-background, var(--builder-bg))'}}
-                font={{color: 'var(--row-font_color, var(--builder-color))'}}
+                background={{color: Theme.background.main}}
+                font={{color: Theme.text.primary}}
             >
                 <i-panel
                     id="pnlRowWrap"
@@ -1431,7 +1455,7 @@ export class PageRow extends Module {
                             border={{
                                 width: '1px',
                                 style: 'dashed',
-                                color: 'var(--builder-divider)',
+                                color: Theme.divider,
                             }}
                             class="text-center"
                         >
@@ -1439,7 +1463,7 @@ export class PageRow extends Module {
                                 caption="Drag Elements Here"
                                 font={{
                                     transform: 'uppercase',
-                                    color: 'var(--row-font_color, var(--builder-color))',
+                                    color: Theme.text.primary,
                                     size: '1.25rem',
                                 }}
                                 opacity={0.5}

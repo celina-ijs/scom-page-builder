@@ -12,6 +12,7 @@ export class UpdatePageSettingsCommand implements ICommand {
   private settings: IPageConfig
   private oldSettings: IPageConfig;
   private rowsConfig: {[key: string]: string} = {};
+  private elemsConfig: {[key: string]: string} = {};
 
   constructor(element: Control, settings: IPageConfig) {
     this.element = element;
@@ -22,6 +23,12 @@ export class UpdatePageSettingsCommand implements ICommand {
       const id = (row?.id || '').replace('row-', '');
       const oldConfig = pageObject.getRowConfig(id) || {};
       this.rowsConfig[id] = JSON.stringify({...this.oldSettings, ...oldConfig});
+      const toolbars = row.querySelectorAll('ide-toolbar');
+      for (let toolbar of toolbars) {
+        const elmId = (toolbar?.module?.id || '').replace('component-', '');
+        const elmConfig = pageObject.getElement(id, elmId) || {};
+        this.elemsConfig[elmId] = JSON.stringify({...elmConfig});
+      }
     }
   }
 
@@ -40,7 +47,7 @@ export class UpdatePageSettingsCommand implements ICommand {
   }
 
   private updateConfig(config: IPageConfig, updatedValues: string[]) {
-    const { backgroundColor, backgroundImage, customBackgroundColor, customTextColor, textColor, customTextSize, textSize, margin } = config;
+    const { backgroundColor, backgroundImage, customBackgroundColor, customTextColor, textColor, customTextSize, textSize, margin, plr = 0, ptb = 0 } = config;
     let newConfig: IPageConfig = {};
     for (let prop of updatedValues) {
       newConfig[prop] = config[prop];
@@ -52,37 +59,37 @@ export class UpdatePageSettingsCommand implements ICommand {
     }
     const defaultBackgroundColor = Theme.background.main
     const defaultTextColor = Theme.text.primary
-    const defaultTextSize = 'md'
-    let data: any = {
-      // customBackgroundColor: customBackgroundColor,
-      // backgroundColor: backgroundColor ?? defaultBackgroundColor,
-      // customTextColor: customTextColor,
-      // textColor: textColor ?? defaultTextColor,
-      // customTextSize: customTextSize,
-      // textSize: textSize ?? defaultTextSize
-    }
+    // const defaultTextSize = 'md'
+    // let data: any = {
+    //   customBackgroundColor: customBackgroundColor,
+    //   backgroundColor: backgroundColor ?? defaultBackgroundColor,
+    //   customTextColor: customTextColor,
+    //   textColor: textColor ?? defaultTextColor,
+    //   customTextSize: customTextSize,
+    //   textSize: textSize ?? defaultTextSize
+    // }
     if (customBackgroundColor) {
-      if (updatedValues.includes('backgroundColor')) {
-        this.element.style.setProperty('--builder-bg', backgroundColor);
-        data.customBackgroundColor = customBackgroundColor
-        data.backgroundColor = backgroundColor;
+      if (updatedValues.includes('backgroundColor') || updatedValues.includes('customBackgroundColor')) {
+        this.element.style.setProperty('--background-main', backgroundColor);
+        // data.customBackgroundColor = customBackgroundColor
+        // data.backgroundColor = backgroundColor;
       }
     } else {
-      this.element.style.setProperty('--builder-bg', defaultBackgroundColor);
+      this.element.style.setProperty('--background-main', defaultBackgroundColor);
     }
     if (customTextColor) {
-      if (updatedValues.includes('textColor')) {
-        this.element.style.setProperty('--builder-color', textColor);
-        data.customTextColor = customTextColor
-        data.textColor = textColor;
+      if (updatedValues.includes('textColor') || updatedValues.includes('customTextColor')) {
+        this.element.style.setProperty('--text-primary', textColor);
+        // data.customTextColor = customTextColor
+        // data.textColor = textColor;
       }
     } else {
-      this.element.style.setProperty('--builder-color', defaultTextColor);
+      this.element.style.setProperty('--text-primary', defaultTextColor);
     }
     if (customTextSize) {
       if (updatedValues.includes('textSize') || updatedValues.includes('customTextSize')) {
         this.element.classList.add(`font-${textSize}`);
-        data.textSize = textSize;
+        // data.textSize = textSize;
       }
     }
     else {
@@ -90,6 +97,13 @@ export class UpdatePageSettingsCommand implements ICommand {
     }
     // TODO: effected undo funtion
     // application.EventBus.dispatch(EVENT.ON_UPDATE_PAGE_BG, {...data});
+
+    this.element.padding = {
+      left: plr,
+      right: plr,
+      top: ptb,
+      bottom: ptb
+    };
     this.element.maxWidth = '100%'; // maxWidth ?? '100%';
     this.element.margin = getMargin(margin);
     pageObject.config = { ...config };
@@ -105,7 +119,7 @@ export class UpdatePageSettingsCommand implements ICommand {
   undo(): void {
     const updatedValues = this.getChangedValues(this.oldSettings, this.settings);
     const newConfig = this.updateConfig(this.oldSettings, updatedValues);
-    application.EventBus.dispatch(EVENT.ON_UPDATE_PAGE_CONFIG, {config: newConfig, rowsConfig: this.rowsConfig});
+    application.EventBus.dispatch(EVENT.ON_UPDATE_PAGE_CONFIG, {config: newConfig, rowsConfig: this.rowsConfig, elemsConfig: this.elemsConfig});
   }
 
   redo(): void {}

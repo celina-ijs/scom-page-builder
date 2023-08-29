@@ -358,7 +358,7 @@ export class BuilderHeader extends Module {
                         font={{ color: 'rgba(0,0,0,.54)' }}
                         background={{ color: 'transparent' }}
                         padding={{ left: 6, right: 6 }} height="100%"
-                        border={{ width: 0, left: {width: '1px', style: 'solid', color: 'var(--builder-divider)'} }}
+                        border={{ width: 0, left: {width: '1px', style: 'solid', color: Theme.divider} }}
                         caption="Header Type"
                         onClick={() => this.onToggleType(true)}
                     ></i-button>

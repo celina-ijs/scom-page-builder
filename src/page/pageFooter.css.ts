@@ -5,7 +5,7 @@ const Theme = currentTheme;
 
 Styles.cssRule('scpage-page-footer', {   
     width: '100%',
-    background: Theme.background.main,
+    // background: Theme.background.main,
     borderTop: '1px solid #dfe5eb',
 
     $nest: {

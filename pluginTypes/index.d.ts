@@ -668,6 +668,7 @@ declare module "@scom/scom-page-builder/command/updateRowSettings.ts" {
         private element;
         private settings;
         private oldSettings;
+        private elemsConfig;
         constructor(element: Control, settings: IPageSectionConfig);
         private getChangedValues;
         private updateConfig;
@@ -903,6 +904,7 @@ declare module "@scom/scom-page-builder/command/updatePageSetting.ts" {
         private settings;
         private oldSettings;
         private rowsConfig;
+        private elemsConfig;
         constructor(element: Control, settings: IPageConfig);
         private getChangedValues;
         private updateConfig;
@@ -1194,6 +1196,9 @@ declare module "@scom/scom-page-builder/page/pageRow.tsx" {
         private clearData;
         setData(rowData: IPageSection): Promise<void>;
         updateRowConfig(config: IPageSectionConfig): void;
+        updateChildren(newValue: any, elemConfigs?: {
+            [key: string]: string;
+        }): void;
         private onOpenRowSettingsDialog;
         private onSaveRowSettings;
         updateColumn(): void;

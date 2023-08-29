@@ -7,6 +7,7 @@ export class UpdateRowSettingsCommand implements ICommand {
   private element: any;
   private settings: IPageSectionConfig
   private oldSettings: any;
+  private elemsConfig: {[key: string]: string} = {};
 
   constructor(element: Control, settings: IPageSectionConfig) {
     this.element = element;
@@ -14,6 +15,13 @@ export class UpdateRowSettingsCommand implements ICommand {
     const data = pageObject.getRowConfig(id) || getPageConfig();
     this.settings = Object.assign({}, data, settings);
     this.oldSettings = {...data};
+    const toolbars = this.element.querySelectorAll('ide-toolbar');
+    for (let toolbar of toolbars) {
+      const elmId = (toolbar?.module?.id || '').replace('component-', '');
+      const oldConfig = pageObject.getElement(id, elmId) || {};
+      console.log('old', {...oldConfig})
+      this.elemsConfig[elmId] = JSON.stringify({...oldConfig});
+    }
   }
 
   private getChangedValues(newValue: IPageSectionConfig, oldValue: IPageSectionConfig) {
@@ -33,7 +41,7 @@ export class UpdateRowSettingsCommand implements ICommand {
     return result;
   }
 
-  private updateConfig(config: IPageSectionConfig, updatedValues: string[]) {
+  private updateConfig(config: IPageSectionConfig, updatedValues: string[], elemConfigs?: {[key: string]: string} ) {
     const id = this.element.id.replace('row-', '');
     const { margin } = config;
     const marginStyle = getMargin(margin);
@@ -51,35 +59,32 @@ export class UpdateRowSettingsCommand implements ICommand {
     if (customTextSize && textSize) {          
       this.element.classList.add(`font-${newConfig.textSize}`)
     }
-    if (updatedValues.includes('backgroundColor') || updatedValues.includes('textColor') || updatedValues.includes('textSize')) {
+    if (updatedValues) {
       const newValue: any = {};
       if (updatedValues.includes('backgroundColor')) {
         newValue.backgroundColor = newConfig?.backgroundColor || '';
         newValue.customBackgroundColor = newConfig?.customBackgroundColor ?? false
         const innerEl = this.element.querySelector('#pnlRowContainer')
-        innerEl && innerEl.style.setProperty('--row-background', newValue.backgroundColor)
+        innerEl && innerEl.style.setProperty('--background-main', newValue.backgroundColor)
       }
       if (updatedValues.includes('textColor')) {
         newValue.textColor = newConfig?.textColor || '';
         newValue.customTextColor = newConfig?.customTextColor ?? false
-        this.element.style.setProperty('--row-font_color', newValue.textColor)
+        this.element.style.setProperty('--text-primary', newValue.textColor)
       }
       newValue.customTextSize = newConfig?.customTextSize ?? false
-      const toolbars = this.element.querySelectorAll('ide-toolbar');
-      for (let toolbar of toolbars) {
-        toolbar.updateUI(newValue);
-      }
+      this.element.updateChildren({...newValue}, {...(elemConfigs || {})})
     }
   }
 
   execute(): void {
     const updatedValues = this.getChangedValues(this.settings, this.oldSettings);
-    this.updateConfig(this.settings, updatedValues);
+    this.updateConfig(this.settings, updatedValues, null);
   }
 
   undo(): void {
     const updatedValues = this.getChangedValues(this.oldSettings, this.settings);
-    this.updateConfig(this.oldSettings, updatedValues);
+    this.updateConfig(this.oldSettings, updatedValues, this.elemsConfig);
   }
 
   redo(): void {}

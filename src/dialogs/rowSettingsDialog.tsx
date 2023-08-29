@@ -45,6 +45,10 @@ export class RowSettingsDialog extends Module {
 
     init() {
         super.init();
+        this.dialog.linkTo = this
+        this.dialog.position = 'fixed'
+        this.dialog.visible = false
+        document.body.appendChild(this.dialog)
     }
 
     show(id: string) {
@@ -463,7 +467,6 @@ export class RowSettingsDialog extends Module {
     render() {
         return (
             <i-modal id={'dialog'}
-                showBackdrop={true}
                 closeOnBackdropClick={false}
                 closeIcon={{ name: 'times' }}
                 visible={false}
