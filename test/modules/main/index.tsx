@@ -82,11 +82,11 @@ export class MainModule extends Module {
         "path": "scom-table",
         "category": "charts"
       },
-      {
-        "name": "Counter",
-        "path": "scom-counter",
-        "category": "charts"
-      },
+      // {
+      //   "name": "Counter",
+      //   "path": "scom-counter",
+      //   "category": "charts"
+      // },
       {
         "name": "Pie Chart",
         "path": "scom-pie-chart",
